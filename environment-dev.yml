@@ -1,0 +1,22 @@
+name:
+  parzivai
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.9
+  - streamlit
+  - pandas
+  - numpy
+  - spacy
+  - selenium
+  - beautifulsoup4
+  - requests
+  - pip
+  - pip:
+      - ipykernel
+      - build
+      - spacy-streamlit
+      - langchain-community
+      - pydantic
+variables:
+  PYTHONPATH: "python"

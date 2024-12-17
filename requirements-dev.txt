@@ -1,0 +1,14 @@
+black
+flake8
+ipykernel
+mypy
+nbsphinx
+nbsphinx-link
+nbval
+pandas
+pre-commit
+pytest
+pytest-cov
+sphinx
+sphinx_mdinclude
+sphinx_rtd_theme

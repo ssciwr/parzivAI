@@ -6,7 +6,11 @@ import spacy_streamlit
 from typing import List
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import WebBaseLoader, PyPDFDirectoryLoader, CSVLoader
+from langchain_community.document_loaders import (
+    WebBaseLoader,
+    PyPDFDirectoryLoader,
+    CSVLoader,
+)
 from langchain_community.vectorstores import FAISS
 from langchain_community.chat_models import ChatOllama
 from langchain_core.messages import HumanMessage, AIMessage
@@ -31,35 +35,46 @@ from datetime import datetime
 # os.environ['TAVILY_API_KEY'] = 'xxx'
 
 # Page configuration (must be first Streamlit command)
-st.set_page_config(
-    page_title="ParzivAI"
-)
+st.set_page_config(page_title="ParzivAI")
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["ParzivAI Chatbot", "Bildersuche", "Linguistische Analyse", "Lernquiz", "User Feedback"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(
+    [
+        "ParzivAI Chatbot",
+        "Bildersuche",
+        "Linguistische Analyse",
+        "Lernquiz",
+        "User Feedback",
+    ]
+)
 
 with tab1:
     st.header("ParzivAI Chatbot")
 
 # Apply custom CSS
-st.markdown("""
+st.markdown(
+    """
 <style>
 div.stButton > button:first-child {
     display: block;
     margin: 0 auto;
 }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
+
 
 @st.cache_resource
 def load_embeddings_model():
     model_name_hf = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
-    model_kwargs_hf = {'device': 'cpu'}
-    encode_kwargs_hf = {'normalize_embeddings': False}
+    model_kwargs_hf = {"device": "cpu"}
+    encode_kwargs_hf = {"normalize_embeddings": False}
     return HuggingFaceEmbeddings(
         model_name=model_name_hf,
         model_kwargs=model_kwargs_hf,
-        encode_kwargs=encode_kwargs_hf
+        encode_kwargs=encode_kwargs_hf,
     )
+
 
 embd = load_embeddings_model()
 
@@ -98,7 +113,7 @@ urls = [
     "https://www.udoklinger.de/Deutsch/Gesch/MHD.html",
     "https://www.nibelungenlied-gesellschaft.de/03_beitrag/bender/nlg-17_bender.html",
     "https://www.nibelungenlied-gesellschaft.de/03_beitrag/galle/galle_fs2.html",
-    "https://www.nibelungenlied-gesellschaft.de/03_beitrag/bender/fs13_bend.html"
+    "https://www.nibelungenlied-gesellschaft.de/03_beitrag/bender/fs13_bend.html",
 ]
 
 # Define persistent folder for FAISS index
@@ -108,6 +123,7 @@ os.makedirs(persist_folder, exist_ok=True)
 # Check if the FAISS index already exists
 index_path = os.path.join(persist_folder, "index.faiss")
 vectorstore_exists = os.path.exists(index_path)
+
 
 @st.cache_data(ttl=3600)
 def load_documents_and_create_vectorstore():
@@ -133,7 +149,9 @@ def load_documents_and_create_vectorstore():
     all_docs = web_docs + pdf_docs + csv_docs
     print(f"Total documents loaded: {len(all_docs)}")
 
-    text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=768, chunk_overlap=30)
+    text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+        chunk_size=768, chunk_overlap=30
+    )
     doc_splits = text_splitter.split_documents(all_docs)
     print("Documents loaded and split successfully.")
 
@@ -143,9 +161,12 @@ def load_documents_and_create_vectorstore():
 
     return vectorstore
 
+
 if vectorstore_exists:
     try:
-        vectorstore = FAISS.load_local(persist_folder, embd, allow_dangerous_deserialization=True)
+        vectorstore = FAISS.load_local(
+            persist_folder, embd, allow_dangerous_deserialization=True
+        )
         print(f"FAISS index loaded successfully from {persist_folder}.")
     except Exception as e:
         print(f"Error loading existing FAISS index: {e}")
@@ -156,26 +177,39 @@ else:
 
 retriever = vectorstore.as_retriever()
 
+
 # Define data models
 class WebSearch(BaseModel):
     query: str = Field(description="The query to use when searching the internet.")
 
+
 class Vectorstore(BaseModel):
     query: str = Field(description="The query to use when searching the vectorstore.")
 
+
 class GradeDocuments(BaseModel):
-    binary_score: str = Field(description="Documents are relevant to the question, 'yes' or 'no'")
+    binary_score: str = Field(
+        description="Documents are relevant to the question, 'yes' or 'no'"
+    )
+
 
 class GradeHallucinations(BaseModel):
-    binary_score: str = Field(description="Answer is grounded in the facts, 'yes' or 'no'")
+    binary_score: str = Field(
+        description="Answer is grounded in the facts, 'yes' or 'no'"
+    )
+
 
 class GradeAnswer(BaseModel):
-    binary_score: str = Field(description="Answer addresses the question, 'yes' or 'no'")
+    binary_score: str = Field(
+        description="Answer addresses the question, 'yes' or 'no'"
+    )
+
 
 class GraphState(BaseModel):
     question: str
     generation: str
     documents: List[str]
+
 
 # Define the system prompt
 SYSTEM_PROMPT = """
@@ -198,7 +232,16 @@ You phrase all of your answers so that they don't exceed 350 tokens.
 """
 
 # Initialize LLM
-llm = ChatOllama(model="parzivai1", temperature=1.1, system_prompt=SYSTEM_PROMPT, keep_alive=10, num_predict=400, top_p=0.91, top_k=0.48)
+llm = ChatOllama(
+    model="parzivai1",
+    temperature=1.1,
+    system_prompt=SYSTEM_PROMPT,
+    keep_alive=10,
+    num_predict=400,
+    top_p=0.91,
+    top_k=0.48,
+)
+
 
 # Define grading function manually
 def grade_document(question: str, document: str) -> str:
@@ -206,25 +249,39 @@ def grade_document(question: str, document: str) -> str:
     print(f"Grading document with prompt: {prompt}")
     response = llm.invoke([HumanMessage(content=prompt)])
     print(f"LLM response: {response.content}")
-    return "yes" if "yes" in response.content.lower() or "ja" in response.content.lower() else "no"
+    return (
+        "yes"
+        if "yes" in response.content.lower() or "ja" in response.content.lower()
+        else "no"
+    )
+
 
 # Initialize web search tool
 web_search_tool = TavilySearchResults()
+
 
 @st.cache_data(ttl=3600)
 def retrieve(question):
     documents = retriever.invoke(question)
     return {"documents": documents, "question": question}
 
+
 def generate_answer(question, documents, messages):
-    context = "\n\n".join([doc.page_content if isinstance(doc, Document) else doc for doc in documents])
+    context = "\n\n".join(
+        [doc.page_content if isinstance(doc, Document) else doc for doc in documents]
+    )
     prompt = f"User question: {question}\n\nContext from documents: {context}\n\nPlease provide a detailed and informative answer based on the context provided."
     messages.append(HumanMessage(content=prompt))
 
     generation = llm.invoke(messages)
     messages[-1].content = generation.content
 
-    return {"documents": documents, "question": question, "generation": generation.content}
+    return {
+        "documents": documents,
+        "question": question,
+        "generation": generation.content,
+    }
+
 
 def llm_fallback_answer(question):
     messages = [HumanMessage(content=question), AIMessage(content="")]
@@ -232,6 +289,7 @@ def llm_fallback_answer(question):
     messages[-1].content = generation.content
 
     return {"question": question, "generation": generation.content}
+
 
 def grade_documents(question, documents):
     filtered_docs = []
@@ -242,14 +300,26 @@ def grade_documents(question, documents):
     print(f"Filtered documents count: {len(filtered_docs)}")
     return {"documents": filtered_docs, "question": question}
 
+
 @st.cache_data(ttl=3600)
 def web_search(question):
     docs = web_search_tool.invoke({"query": question})
     if isinstance(docs, dict) and "results" in docs:
         docs = docs["results"]
-    web_results = "\n".join([f"- [{d['url']}]({d['url']}): {d['content']}" for d in docs if isinstance(d, dict) and 'url' in d and 'content' in d])
+    web_results = "\n".join(
+        [
+            f"- [{d['url']}]({d['url']}): {d['content']}"
+            for d in docs
+            if isinstance(d, dict) and "url" in d and "content" in d
+        ]
+    )
     web_results_doc = Document(page_content=web_results)
-    return {"documents": [web_results_doc], "question": question, "web_results": web_results}
+    return {
+        "documents": [web_results_doc],
+        "question": question,
+        "web_results": web_results,
+    }
+
 
 def decide_route(question):
     documents = retrieve(question)["documents"]
@@ -267,19 +337,23 @@ def decide_route(question):
         web_search_results = web_search(question)
         return web_search_results | {"route_taken": "WebSearch"}
 
+
 def grade_generation_v_documents_and_question(question, documents, generation):
     score = grade_document(question, generation)
     return "useful" if score == "yes" else "not useful"
+
 
 def image_search(topic: str) -> str:
     encoded_topic = quote(topic.strip('"'))
     search_url = f"https://realonline.imareal.sbg.ac.at/suche#%7B%22s%22%3A%22{encoded_topic}%22%7D"
     return search_url
 
+
 def adjust_image_url(base_url: str, url: str) -> str:
-    if 'WID=400' in url and 'HEI=400' in url:
-        url = url.replace('WID=400', 'WID=1000').replace('HEI=400', 'HEI=1000')
+    if "WID=400" in url and "HEI=400" in url:
+        url = url.replace("WID=400", "WID=1000").replace("HEI=400", "HEI=1000")
     return urljoin(base_url, url)
+
 
 async def fetch_images(topic: str):
     async with async_playwright() as p:
@@ -290,7 +364,8 @@ async def fetch_images(topic: str):
         await page.goto(search_url)
         await asyncio.sleep(5)  # Wait for the page to fully load
 
-        image_data = await page.evaluate('''() => {
+        image_data = await page.evaluate(
+            """() => {
             const images = document.querySelectorAll('img.hit-btn-image-sm');
             const data = Array.from(images).map(img => {
                 const container = img.closest('.hit-cell');
@@ -316,18 +391,27 @@ async def fetch_images(topic: str):
                 };
             }).filter(item => item !== null);
             return data;
-        }''')
+        }"""
+        )
 
         await browser.close()
         return image_data
 
+
 async def display_images(topic: str):
     image_data = await fetch_images(topic)
     for data in image_data:
-        st.image(data['url'], caption=f"Bildthema: {data['name']}, Archivnummer: {data['archiveNumber']}, URL: {data['url']}", use_column_width=True)
+        st.image(
+            data["url"],
+            caption=f"Bildthema: {data['name']}, Archivnummer: {data['archiveNumber']}, URL: {data['url']}",
+            use_column_width=True,
+        )
+
 
 st.title("ParzivAI")
-st.write("ParzivAI helps you with questions about the Middle Ages and Middle High German language and literature.")
+st.write(
+    "ParzivAI helps you with questions about the Middle Ages and Middle High German language and literature."
+)
 
 st.sidebar.title("Navigation")
 
@@ -379,7 +463,12 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 if "state" not in st.session_state:
-    st.session_state.state = {"question": "", "documents": [], "messages": [], "route_taken": ""}
+    st.session_state.state = {
+        "question": "",
+        "documents": [],
+        "messages": [],
+        "route_taken": "",
+    }
 
 if "feedback" not in st.session_state:
     st.session_state.feedback = []
@@ -387,17 +476,27 @@ if "feedback" not in st.session_state:
 if "page" not in st.session_state:
     st.session_state.page = "main"
 
-def append_message_to_history(role, message):
-    st.session_state.chat_history = pd.concat([st.session_state.chat_history, pd.DataFrame({
-        'Chat_Timestamp': [datetime.now()],
-        'Chat_Role': [role],
-        'Chat_Message': [message]
-    })], ignore_index=True)
 
-for message in st.session_state['messages']:
+def append_message_to_history(role, message):
+    st.session_state.chat_history = pd.concat(
+        [
+            st.session_state.chat_history,
+            pd.DataFrame(
+                {
+                    "Chat_Timestamp": [datetime.now()],
+                    "Chat_Role": [role],
+                    "Chat_Message": [message],
+                }
+            ),
+        ],
+        ignore_index=True,
+    )
+
+
+for message in st.session_state["messages"]:
     role = "user" if isinstance(message, HumanMessage) else "assistant"
     content = message.content
-    avatar = "parzivai.png" if role == 'assistant' else None
+    avatar = "parzivai.png" if role == "assistant" else None
     with st.chat_message(role, avatar=avatar):
         st.markdown(content)
     append_message_to_history(role, content)
@@ -405,33 +504,95 @@ for message in st.session_state['messages']:
 nlp_modern = spacy.load("de_core_news_sm")
 
 try:
-    nlp_mhg = spacy.load("/mnt/data/rx262/chatbot/Spacy-Model-for-Middle-High-German/models/model-best")
+    nlp_mhg = spacy.load(
+        "/mnt/data/rx262/chatbot/Spacy-Model-for-Middle-High-German/models/model-best"
+    )
     nlp_mhg.add_pipe("sentencizer")
 except Exception as e:
     st.error(f"Could not load Middle High German model: {e}")
     nlp_mhg = None
 
 TAG_TO_POS = {
-    "$_": "SYM", "--": "PUNCT", "ADJA": "ADJ", "ADJD": "ADJ", "ADJN": "ADJ", "ADJS": "ADJ",
-    "APPR": "ADP", "AVD": "ADV", "AVD-KO*": "ADV", "AVG": "ADV", "AVW": "ADV",
-    "CARDA": "NUM", "CARDD": "NUM", "CARDN": "NUM", "CARDS": "NUM", "DDA": "DET",
-    "DDART": "DET", "DDD": "DET", "DDN": "DET", "DDS": "DET", "DGA": "DET",
-    "DGS": "DET", "DIA": "PRON", "DIART": "PRON", "DID": "PRON", "DIN": "PRON",
-    "DIS": "PRON", "DPOSA": "PRON", "DPOSD": "PRON", "DPOSN": "PRON", "DPOSS": "PRON",
-    "DRELS": "PRON", "DWA": "PRON", "DWD": "PRON", "DWS": "PRON", "FM": "X",
-    "ITJ": "INTJ", "KO*": "CCONJ", "KOKOM": "CCONJ", "KON": "CCONJ", "KOUS": "SCONJ",
-    "NA": "NOUN", "NE": "PROPN", "PAVAP": "ADV", "PAVD": "ADV", "PAVG": "ADV",
-    "PAVW": "ADV", "PG": "PRON", "PI": "PRON", "PPER": "PRON", "PRF": "PRON",
-    "PTK": "PART", "PTK*": "PART", "PTKA": "PART", "PTKANT": "PART", "PTKNEG": "PART",
-    "PTKVZ": "PART", "PW": "PRON", "VAFIN": "VERB", "VAIMP": "VERB", "VAINF": "VERB",
-    "VAPP": "VERB", "VAPS": "VERB", "VMFIN": "VERB", "VMIMP": "VERB", "VMINF": "VERB",
-    "VMPP": "VERB", "VV": "VERB", "VVFIN": "VERB", "VVIMP": "VERB", "VVINF": "VERB",
-    "VVPP": "VERB", "VVPS": "VERB"
+    "$_": "SYM",
+    "--": "PUNCT",
+    "ADJA": "ADJ",
+    "ADJD": "ADJ",
+    "ADJN": "ADJ",
+    "ADJS": "ADJ",
+    "APPR": "ADP",
+    "AVD": "ADV",
+    "AVD-KO*": "ADV",
+    "AVG": "ADV",
+    "AVW": "ADV",
+    "CARDA": "NUM",
+    "CARDD": "NUM",
+    "CARDN": "NUM",
+    "CARDS": "NUM",
+    "DDA": "DET",
+    "DDART": "DET",
+    "DDD": "DET",
+    "DDN": "DET",
+    "DDS": "DET",
+    "DGA": "DET",
+    "DGS": "DET",
+    "DIA": "PRON",
+    "DIART": "PRON",
+    "DID": "PRON",
+    "DIN": "PRON",
+    "DIS": "PRON",
+    "DPOSA": "PRON",
+    "DPOSD": "PRON",
+    "DPOSN": "PRON",
+    "DPOSS": "PRON",
+    "DRELS": "PRON",
+    "DWA": "PRON",
+    "DWD": "PRON",
+    "DWS": "PRON",
+    "FM": "X",
+    "ITJ": "INTJ",
+    "KO*": "CCONJ",
+    "KOKOM": "CCONJ",
+    "KON": "CCONJ",
+    "KOUS": "SCONJ",
+    "NA": "NOUN",
+    "NE": "PROPN",
+    "PAVAP": "ADV",
+    "PAVD": "ADV",
+    "PAVG": "ADV",
+    "PAVW": "ADV",
+    "PG": "PRON",
+    "PI": "PRON",
+    "PPER": "PRON",
+    "PRF": "PRON",
+    "PTK": "PART",
+    "PTK*": "PART",
+    "PTKA": "PART",
+    "PTKANT": "PART",
+    "PTKNEG": "PART",
+    "PTKVZ": "PART",
+    "PW": "PRON",
+    "VAFIN": "VERB",
+    "VAIMP": "VERB",
+    "VAINF": "VERB",
+    "VAPP": "VERB",
+    "VAPS": "VERB",
+    "VMFIN": "VERB",
+    "VMIMP": "VERB",
+    "VMINF": "VERB",
+    "VMPP": "VERB",
+    "VV": "VERB",
+    "VVFIN": "VERB",
+    "VVIMP": "VERB",
+    "VVINF": "VERB",
+    "VVPP": "VERB",
+    "VVPS": "VERB",
 }
+
 
 def pos_tagging_modern(text):
     doc = nlp_modern(text)
     return doc
+
 
 def pos_tagging_mhg(text):
     if nlp_mhg:
@@ -443,25 +604,82 @@ def pos_tagging_mhg(text):
         st.error("Middle High German model is not available.")
         return None
 
+
 def check_attributes(doc):
     for token in doc:
         print(f"Text: {token.text}, POS: {token.pos_}, TAG: {token.tag_}")
 
+
 sensitive_topics = [
-    "self-harm", "suicide", "kill myself", "threat", "abuse", "curse", "damn", "hell", "will sterben", "hurensohn",
-    "Selbstmord", "Suizid", "töten", "Bedrohung", "Missbrauch", "Fluch", "verdammt", "Hölle", "ich will sterben",
-    "Depression", "depressiv", "traurig", "allein", "einsam"
+    "self-harm",
+    "suicide",
+    "kill myself",
+    "threat",
+    "abuse",
+    "curse",
+    "damn",
+    "hell",
+    "will sterben",
+    "hurensohn",
+    "Selbstmord",
+    "Suizid",
+    "töten",
+    "Bedrohung",
+    "Missbrauch",
+    "Fluch",
+    "verdammt",
+    "Hölle",
+    "ich will sterben",
+    "Depression",
+    "depressiv",
+    "traurig",
+    "allein",
+    "einsam",
 ]
 
 insults = [
-    "idiot", "stupid", "dumb", "fool", "shut up", "loser", "useless", "worthless", "hate you", "fuck you", "bastard",
-    "dumm", "idiot", "blöd", "Narr", "halt die Klappe", "Verlierer", "nutzlos", "wertlos", "ich hasse dich", "Scheißkerl"
+    "idiot",
+    "stupid",
+    "dumb",
+    "fool",
+    "shut up",
+    "loser",
+    "useless",
+    "worthless",
+    "hate you",
+    "fuck you",
+    "bastard",
+    "dumm",
+    "idiot",
+    "blöd",
+    "Narr",
+    "halt die Klappe",
+    "Verlierer",
+    "nutzlos",
+    "wertlos",
+    "ich hasse dich",
+    "Scheißkerl",
 ]
 
 simple_inquiries = [
-    "hello", "hi", "how are you", "what's up", "who are you", "tell me about yourself", "what is your purpose", "tell me a joke",
-    "hallo", "hi", "wie geht es dir", "was ist los", "wer bist du", "erzähl mir von dir", "was ist dein Zweck", "erzähl mir einen Witz"
+    "hello",
+    "hi",
+    "how are you",
+    "what's up",
+    "who are you",
+    "tell me about yourself",
+    "what is your purpose",
+    "tell me a joke",
+    "hallo",
+    "hi",
+    "wie geht es dir",
+    "was ist los",
+    "wer bist du",
+    "erzähl mir von dir",
+    "was ist dein Zweck",
+    "erzähl mir einen Witz",
 ]
+
 
 def get_emergency_response():
     try:
@@ -470,12 +688,14 @@ def get_emergency_response():
     except FileNotFoundError:
         return "Emergency contact information is not available at the moment."
 
+
 def get_insult_response():
     try:
         with open("insults.txt", "r") as file:
             return file.read()
     except FileNotFoundError:
         return "Insult response information is not available at the moment."
+
 
 user_input = st.chat_input("Ask ParzivAI a question:")
 
@@ -490,9 +710,13 @@ if user_input:
 
     if "übersetze" in user_input.lower():
         with st.chat_message("assistant"):
-            st.markdown("🔄 Übersetzung angefordert - Antwort wird direkt durch ParzivAI generiert")
+            st.markdown(
+                "🔄 Übersetzung angefordert - Antwort wird direkt durch ParzivAI generiert"
+            )
         translation_response = llm.invoke([HumanMessage(content=user_input)])
-        st.session_state.messages.append(AIMessage(content=translation_response.content))
+        st.session_state.messages.append(
+            AIMessage(content=translation_response.content)
+        )
         with st.chat_message("assistant", avatar="parzivai.png"):
             st.markdown(translation_response.content)
         append_message_to_history("Assistant", translation_response.content)
@@ -526,15 +750,35 @@ if user_input:
 
         if st.session_state.state["route_taken"] == "Vectorstore":
             with st.chat_message("assistant"):
-                st.markdown("📚 Relevant documents found in Vectorstore. Using these documents for answer generation.")
-            st.session_state.state.update(generate_answer(st.session_state.state["question"], st.session_state.state["documents"], st.session_state.state["messages"]))
+                st.markdown(
+                    "📚 Relevant documents found in Vectorstore. Using these documents for answer generation."
+                )
+            st.session_state.state.update(
+                generate_answer(
+                    st.session_state.state["question"],
+                    st.session_state.state["documents"],
+                    st.session_state.state["messages"],
+                )
+            )
         else:
             with st.chat_message("assistant"):
-                st.markdown("🌐 No relevant documents found in Vectorstore. Using web search results for answer generation.")
-            st.session_state.state.update(generate_answer(st.session_state.state["question"], st.session_state.state["documents"], st.session_state.state["messages"]))
+                st.markdown(
+                    "🌐 No relevant documents found in Vectorstore. Using web search results for answer generation."
+                )
+            st.session_state.state.update(
+                generate_answer(
+                    st.session_state.state["question"],
+                    st.session_state.state["documents"],
+                    st.session_state.state["messages"],
+                )
+            )
 
         if st.session_state.state["documents"]:
-            document_texts = [doc.page_content for doc in st.session_state.state["documents"] if isinstance(doc, Document)]
+            document_texts = [
+                doc.page_content
+                for doc in st.session_state.state["documents"]
+                if isinstance(doc, Document)
+            ]
             document_embeddings = embd.embed_documents(document_texts)
             st.session_state.cached_data["embeddings"].extend(document_embeddings)
             st.session_state.cached_data["prompts"].append(user_input)
@@ -546,7 +790,7 @@ if user_input:
             "WebSearch": "🌐",
             "Fallback": "🤖",
             "useful": "✅",
-            "not useful": "❌"
+            "not useful": "❌",
         }.get(st.session_state.state["route_taken"], "🤖")
 
         assistant_message = emoji + " " + st.session_state.state["generation"]
@@ -565,12 +809,14 @@ if user_input:
         append_message_to_history("Assistant", assistant_message)
 
         if st.session_state.state["route_taken"] == "WebSearch":
-            st.session_state.cached_data["web_results"].append(st.session_state.state["web_results"])
+            st.session_state.cached_data["web_results"].append(
+                st.session_state.state["web_results"]
+            )
 
         routing_decision = {
             "question": user_input,
             "route_taken": st.session_state.state["route_taken"],
-            "filtered_documents_count": len(st.session_state.state["documents"])
+            "filtered_documents_count": len(st.session_state.state["documents"]),
         }
         st.session_state.routing_data.append(routing_decision)
 
@@ -590,42 +836,62 @@ if st.button("POS-Tagging (Mittelhochdeutsch)"):
         st.experimental_rerun()  # Ensure the interface updates
 
 # Initialize session state variables
-if 'chat_history' not in st.session_state:
-    st.session_state.chat_history = pd.DataFrame(columns=['Chat_Timestamp', 'Chat_Role', 'Chat_Message'])
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = pd.DataFrame(
+        columns=["Chat_Timestamp", "Chat_Role", "Chat_Message"]
+    )
 
-if 'feedback_data' not in st.session_state:
-    st.session_state.feedback_data = pd.DataFrame(columns=['Feedback_Timestamp', 'Feedback_Score', 'Feedback_Comments'])
+if "feedback_data" not in st.session_state:
+    st.session_state.feedback_data = pd.DataFrame(
+        columns=["Feedback_Timestamp", "Feedback_Score", "Feedback_Comments"]
+    )
+
 
 # Function to update chat history
 def update_chat_history(role, message):
-    new_entry = pd.DataFrame({
-        'Chat_Timestamp': [datetime.now()],
-        'Chat_Role': [role],
-        'Chat_Message': [message]
-    })
-    st.session_state.chat_history = pd.concat([st.session_state.chat_history, new_entry], ignore_index=True)
+    new_entry = pd.DataFrame(
+        {
+            "Chat_Timestamp": [datetime.now()],
+            "Chat_Role": [role],
+            "Chat_Message": [message],
+        }
+    )
+    st.session_state.chat_history = pd.concat(
+        [st.session_state.chat_history, new_entry], ignore_index=True
+    )
+
 
 # Feedback collection
-feedback = streamlit_feedback(feedback_type="faces", optional_text_label="Please provide additional feedback (optional)", key="feedback")
+feedback = streamlit_feedback(
+    feedback_type="faces",
+    optional_text_label="Please provide additional feedback (optional)",
+    key="feedback",
+)
 
 if feedback:
-    new_feedback = pd.DataFrame({
-        'Feedback_Timestamp': [datetime.now()],
-        'Feedback_Score': [feedback['score']],
-        'Feedback_Comments': [feedback['text']]
-    })
-    st.session_state.feedback_data = pd.concat([st.session_state.feedback_data, new_feedback], ignore_index=True)
+    new_feedback = pd.DataFrame(
+        {
+            "Feedback_Timestamp": [datetime.now()],
+            "Feedback_Score": [feedback["score"]],
+            "Feedback_Comments": [feedback["text"]],
+        }
+    )
+    st.session_state.feedback_data = pd.concat(
+        [st.session_state.feedback_data, new_feedback], ignore_index=True
+    )
 
     # Combine chat history and feedback
     combined_data = st.session_state.chat_history.copy()
-    combined_data = combined_data.append(st.session_state.feedback_data, ignore_index=True)
+    combined_data = combined_data.append(
+        st.session_state.feedback_data, ignore_index=True
+    )
 
     # Debugging step to print combined data
     st.write("Combined data before saving:")
     st.write(combined_data)
 
     # Save to CSV
-    feedback_file = 'pages/feedback_combined.csv'
+    feedback_file = "pages/feedback_combined.csv"
     if os.path.exists(feedback_file):
         existing_data = pd.read_csv(feedback_file)
         combined_data = pd.concat([existing_data, combined_data], ignore_index=True)
@@ -642,7 +908,9 @@ if feedback:
 # Display feedback tab content only in the feedback tab
 with tab5:
     st.header("User Feedback")
-    st.write("Current session feedback data:", st.session_state.feedback)  # Debugging statement
+    st.write(
+        "Current session feedback data:", st.session_state.feedback
+    )  # Debugging statement
     feedback_file = "pages/feedback_combined.csv"
     if os.path.exists(feedback_file) and os.stat(feedback_file).st_size != 0:
         feedback_df = pd.read_csv(feedback_file)
@@ -694,7 +962,10 @@ with tab4:
 
     def submit_answer():
         st.session_state.answer_submitted = True
-        if st.session_state.selected_option == quiz_data[st.session_state.current_index]['answer']:
+        if (
+            st.session_state.selected_option
+            == quiz_data[st.session_state.current_index]["answer"]
+        ):
             st.session_state.score += 10
 
     def next_question():
@@ -721,8 +992,8 @@ with tab4:
     st.subheader(f"Question {st.session_state.current_index + 1}")
     st.title(f"{question_item['question']}")
 
-    options = question_item['options']
-    correct_answer = question_item['answer']
+    options = question_item["options"]
+    correct_answer = question_item["answer"]
 
     if st.session_state.answer_submitted:
         for option in options:
@@ -736,18 +1007,20 @@ with tab4:
         selected_option = st.radio(
             label="Select an option:",
             options=options,
-            key=f"selected_option_{st.session_state.current_index}"
+            key=f"selected_option_{st.session_state.current_index}",
         )
 
-        if st.button('Submit'):
+        if st.button("Submit"):
             st.session_state.selected_option = selected_option
             submit_answer()
 
     if st.session_state.answer_submitted:
         if st.session_state.current_index < len(quiz_data) - 1:
-            if st.button('Next'):
+            if st.button("Next"):
                 next_question()
         else:
-            st.write(f"Quiz completed! Your score is: {st.session_state.score} / {len(quiz_data) * 10}")
-            if st.button('Restart'):
+            st.write(
+                f"Quiz completed! Your score is: {st.session_state.score} / {len(quiz_data) * 10}"
+            )
+            if st.button("Restart"):
                 restart_quiz()
