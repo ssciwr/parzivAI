@@ -36,3 +36,9 @@ jobs:
     - name: Install Python package
       run: |
         python -m pip install -v .
+        python -m pip install -r requirements-dev.txt
+        python -m pip install playwright
+
+    - name: Install Playwright browsers
+      run: |
+        python -m playwright install --with-deps

@@ -18,5 +18,8 @@ dependencies:
       - spacy-streamlit
       - langchain-community
       - pydantic
+      - sentence-transformers
+      - streamlit-feedback
+      - webdriver-manager
 variables:
   PYTHONPATH: "python"
