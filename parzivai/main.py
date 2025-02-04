@@ -1,3 +1,8 @@
+"""
+Global proposal:
+If we have time, split the code into multiple files for better organization and readability. Also, it would be good to split code into classes and functions for better modularity and reusability.
+"""
+
 import os
 import streamlit as st
 import pandas as pd
@@ -124,9 +129,73 @@ os.makedirs(persist_folder, exist_ok=True)
 index_path = os.path.join(persist_folder, "index.faiss")
 vectorstore_exists = os.path.exists(index_path)
 
+###
+# @st.cache_data(ttl=3600)
+# def load_documents_and_create_vectorstore():
+#     web_docs = []
+#     for url in urls:
+#         try:
+#             loader = WebBaseLoader(url)
+#             web_docs.extend(loader.load())
+#         except Exception as e:
+#             print(f"Error loading URL {url}: {e}")
 
-@st.cache_data(ttl=3600)
+#     print(f"Loaded {len(web_docs)} documents from URLs.")
+
+#     pdf_folder = "./pdfs"
+#     pdf_loader = PyPDFDirectoryLoader(pdf_folder)
+#     pdf_docs = pdf_loader.load()
+#     print(f"Loaded {len(pdf_docs)} documents from PDFs.")
+
+#     csv = CSVLoader(file_path="texte.csv")
+#     csv_docs = csv.load()
+#     print(f"Loaded {len(csv_docs)} documents from CSVs.")
+
+#     all_docs = web_docs + pdf_docs + csv_docs
+#     print(f"Total documents loaded: {len(all_docs)}")
+
+#     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+#         chunk_size=768, chunk_overlap=30
+#     )
+#     doc_splits = text_splitter.split_documents(all_docs)
+#     print("Documents loaded and split successfully.")
+
+#     vectorstore = FAISS.from_documents(doc_splits, embd)
+#     vectorstore.save_local(persist_folder)
+#     print(f"FAISS index initialized and saved successfully in {persist_folder}.")
+
+#     return vectorstore
+###
+
+########
+"""
+Proposal #1:
+    A) Load URLs from  a JSON configuration file (as an example), instead of hardcoding them in the script
+    B) Load documents from  a specifically defined folder (e.g. static_data), for better organization
+
+    Additional comment on the A): In my notes I have the task " to delete the web-scraping part and api-keys, so it might mean that we don't need a URL loader at all.
+
+"""
+
+
+def load_config(file_path):
+    try:
+        with open(file_path, "r") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        st.error(f"Configuration file not found: {file_path}")
+        return {}
+    except json.JSONDecodeError as e:
+        st.error(f"Error decoding configuration file: {e}")
+        return {}
+
+
 def load_documents_and_create_vectorstore():
+    """Load documents from URLs and static files to create FAISS vector store."""
+    # Load URLs
+    urls = load_config()
+
+    # Load documents from URLs
     web_docs = []
     for url in urls:
         try:
@@ -135,31 +204,39 @@ def load_documents_and_create_vectorstore():
         except Exception as e:
             print(f"Error loading URL {url}: {e}")
 
-    print(f"Loaded {len(web_docs)} documents from URLs.")
+    # Load documents from static folder
+    static_data_folder = "./static_data"
+    os.makedirs(static_data_folder, exist_ok=True)
+    static_docs = []
+    for file_name in os.listdir(static_data_folder):
+        file_path = os.path.join(static_data_folder, file_name)
+        try:
+            if file_name.endswith(".pdf"):
+                loader = PyPDFDirectoryLoader(file_path)
+            elif file_name.endswith(".csv"):
+                loader = CSVLoader(file_path=file_path)
+            else:
+                continue
+            static_docs.extend(loader.load())
+        except Exception as e:
+            print(f"Error loading file {file_name}: {e}")
 
-    pdf_folder = "./pdfs"
-    pdf_loader = PyPDFDirectoryLoader(pdf_folder)
-    pdf_docs = pdf_loader.load()
-    print(f"Loaded {len(pdf_docs)} documents from PDFs.")
-
-    csv = CSVLoader(file_path="texte.csv")
-    csv_docs = csv.load()
-    print(f"Loaded {len(csv_docs)} documents from CSVs.")
-
-    all_docs = web_docs + pdf_docs + csv_docs
-    print(f"Total documents loaded: {len(all_docs)}")
-
+    # Combine and process documents
+    all_docs = web_docs + static_docs
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
         chunk_size=768, chunk_overlap=30
     )
     doc_splits = text_splitter.split_documents(all_docs)
     print("Documents loaded and split successfully.")
 
+    # Create and save FAISS vector store
     vectorstore = FAISS.from_documents(doc_splits, embd)
     vectorstore.save_local(persist_folder)
     print(f"FAISS index initialized and saved successfully in {persist_folder}.")
-
     return vectorstore
+
+
+########
 
 
 if vectorstore_exists:
@@ -343,24 +420,115 @@ def grade_generation_v_documents_and_question(question, documents, generation):
     return "useful" if score == "yes" else "not useful"
 
 
-def image_search(topic: str) -> str:
-    encoded_topic = quote(topic.strip('"'))
-    search_url = f"https://realonline.imareal.sbg.ac.at/suche#%7B%22s%22%3A%22{encoded_topic}%22%7D"
-    return search_url
+###
+# def image_search(topic: str) -> str:
+#     encoded_topic = quote(topic.strip('"'))
+#     search_url = f"https://realonline.imareal.sbg.ac.at/suche#%7B%22s%22%3A%22{encoded_topic}%22%7D"
+#     return search_url
+
+
+# def adjust_image_url(base_url: str, url: str) -> str:
+#     if "WID=400" in url and "HEI=400" in url:
+#         url = url.replace("WID=400", "WID=1000").replace("HEI=400", "HEI=1000")
+#     return urljoin(base_url, url)
+
+
+# async def fetch_images(topic: str):
+#     async with async_playwright() as p:
+#         browser = await p.chromium.launch(headless=True)
+#         page = await browser.new_page()
+#         encoded_topic = quote(topic.strip('"'))
+#         search_url = f"https://realonline.imareal.sbg.ac.at/suche#%7B%22s%22%3A%22{encoded_topic}%22%7D"
+#         await page.goto(search_url)
+#         await asyncio.sleep(5)  # Wait for the page to fully load
+
+#         image_data = await page.evaluate(
+#             """() => {
+#             const images = document.querySelectorAll('img.hit-btn-image-sm');
+#             const data = Array.from(images).map(img => {
+#                 const container = img.closest('.hit-cell');
+#                 if (!container) {
+#                     console.error('Container not found for image:', img.src);
+#                     return null;
+#                 }
+
+#                 const nameElement = Array.from(container.querySelectorAll('.property .additional_info_medium')).find(el => el.innerText.includes('Bildthema:'));
+#                 const archiveNumberElement = Array.from(container.querySelectorAll('.property .additional_info_medium')).find(el => el.innerText.includes('Archivnummer:'));
+
+#                 const name = nameElement ? nameElement.nextElementSibling.innerText : 'Name not found';
+#                 const archiveNumber = archiveNumberElement ? archiveNumberElement.nextElementSibling.innerText : 'Archivnummer not found';
+
+#                 if (!nameElement || !archiveNumberElement) {
+#                     console.error('Name or archive number element not found for image:', img.src);
+#                 }
+
+#                 return {
+#                     url: img.src,
+#                     name: name,
+#                     archiveNumber: archiveNumber
+#                 };
+#             }).filter(item => item !== null);
+#             return data;
+#         }"""
+#         )
+
+#         await browser.close()
+#         return image_data
+
+
+# async def display_images(topic: str):
+#     image_data = await fetch_images(topic)
+#     for data in image_data:
+#         st.image(
+#             data["url"],
+#             caption=f"Bildthema: {data['name']}, Archivnummer: {data['archiveNumber']}, URL: {data['url']}",
+#             use_column_width=True,
+#         )
+###
+
+############
+"""
+Proposal #2:
+    Instead of having the link, hardcoded in the script, we can load it from a configuration file.
+
+"""
+# Load configuration from file
+CONFIG_PATH = "config.json"
+
+try:
+    with open(CONFIG_PATH, "r") as config_file:
+        config = json.load(config_file)
+        IMAGE_SEARCH_URL = config.get(
+            "image_search_url"
+        )  # it would be defined in the config file
+except FileNotFoundError:
+    st.error(f"Configuration file not found at {CONFIG_PATH}. Please ensure it exists.")
+    raise
+except json.JSONDecodeError as e:
+    st.error(f"Error decoding configuration file: {e}")
+    raise
 
 
 def adjust_image_url(base_url: str, url: str) -> str:
+    """Adjust image URL parameters for higher resolution."""
     if "WID=400" in url and "HEI=400" in url:
         url = url.replace("WID=400", "WID=1000").replace("HEI=400", "HEI=1000")
-    return urljoin(base_url, url)
+    return url
+
+
+def construct_image_search_url(topic: str) -> str:
+    """Construct the search URL for the hardcoded site."""
+    encoded_topic = quote(topic.strip('"'))
+    return f"{IMAGE_SEARCH_URL}#%7B%22s%22%3A%22{encoded_topic}%22%7D"
 
 
 async def fetch_images(topic: str):
+    """Fetch images related to a topic from the hardcoded site."""
+    search_url = construct_image_search_url(topic)
+
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
-        encoded_topic = quote(topic.strip('"'))
-        search_url = f"https://realonline.imareal.sbg.ac.at/suche#%7B%22s%22%3A%22{encoded_topic}%22%7D"
         await page.goto(search_url)
         await asyncio.sleep(5)  # Wait for the page to fully load
 
@@ -399,6 +567,7 @@ async def fetch_images(topic: str):
 
 
 async def display_images(topic: str):
+    """Display fetched images in Streamlit."""
     image_data = await fetch_images(topic)
     for data in image_data:
         st.image(
@@ -408,15 +577,39 @@ async def display_images(topic: str):
         )
 
 
+############
+
+
 st.title("ParzivAI")
 st.write(
     "ParzivAI helps you with questions about the Middle Ages and Middle High German language and literature."
 )
 
 st.sidebar.title("Navigation")
+st.sidebar.image("parzivai.png", width=150)
 
 if "cached_data" not in st.session_state:
     st.session_state.cached_data = {"embeddings": [], "prompts": [], "web_results": []}
+
+if "routing_data" not in st.session_state:
+    st.session_state.routing_data = []
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+if "state" not in st.session_state:
+    st.session_state.state = {
+        "question": "",
+        "documents": [],
+        "messages": [],
+        "route_taken": "",
+    }
+
+if "feedback" not in st.session_state:
+    st.session_state.feedback = []
+
+if "page" not in st.session_state:
+    st.session_state.page = "main"
 
 with st.sidebar.expander("Cached Data"):
     st.write("Embeddings:")
@@ -425,6 +618,11 @@ with st.sidebar.expander("Cached Data"):
     st.write(st.session_state.cached_data["prompts"])
     st.write("Web Results:")
     st.write(st.session_state.cached_data["web_results"])
+
+with st.sidebar.expander("Routing and Grading Processes"):
+    if "routing_data" in st.session_state:
+        for data in st.session_state.routing_data:
+            st.write(data)
 
 POS_DESCRIPTIONS = {
     "SYM": "Symbol",
@@ -449,48 +647,22 @@ with st.sidebar.expander("POS Tag Descriptions"):
     for pos, desc in POS_DESCRIPTIONS.items():
         st.write(f"{pos}: {desc}")
 
-if "routing_data" not in st.session_state:
-    st.session_state.routing_data = []
-
-with st.sidebar.expander("Routing and Grading Processes"):
-    if "routing_data" in st.session_state:
-        for data in st.session_state.routing_data:
-            st.write(data)
-
-st.sidebar.image("parzivai.png", width=150)
-
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-if "state" not in st.session_state:
-    st.session_state.state = {
-        "question": "",
-        "documents": [],
-        "messages": [],
-        "route_taken": "",
-    }
-
-if "feedback" not in st.session_state:
-    st.session_state.feedback = []
-
-if "page" not in st.session_state:
-    st.session_state.page = "main"
-
 
 def append_message_to_history(role, message):
-    st.session_state.chat_history = pd.concat(
-        [
-            st.session_state.chat_history,
-            pd.DataFrame(
-                {
-                    "Chat_Timestamp": [datetime.now()],
-                    "Chat_Role": [role],
-                    "Chat_Message": [message],
-                }
-            ),
-        ],
-        ignore_index=True,
-    )
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = pd.concat(
+            [
+                st.session_state.chat_history,
+                pd.DataFrame(
+                    {
+                        "Chat_Timestamp": [datetime.now()],
+                        "Chat_Role": [role],
+                        "Chat_Message": [message],
+                    }
+                ),
+            ],
+            ignore_index=True,
+        )
 
 
 for message in st.session_state["messages"]:
@@ -501,7 +673,12 @@ for message in st.session_state["messages"]:
         st.markdown(content)
     append_message_to_history(role, content)
 
-nlp_modern = spacy.load("de_core_news_sm")
+####
+try:
+    nlp_modern = spacy.load("de_core_news_sm")
+except Exception as e:
+    st.error(f"Could not load modern German model: {e}")
+    nlp_modern = None
 
 try:
     nlp_mhg = spacy.load(
@@ -610,75 +787,85 @@ def check_attributes(doc):
         print(f"Text: {token.text}, POS: {token.pos_}, TAG: {token.tag_}")
 
 
-sensitive_topics = [
-    "self-harm",
-    "suicide",
-    "kill myself",
-    "threat",
-    "abuse",
-    "curse",
-    "damn",
-    "hell",
-    "will sterben",
-    "hurensohn",
-    "Selbstmord",
-    "Suizid",
-    "töten",
-    "Bedrohung",
-    "Missbrauch",
-    "Fluch",
-    "verdammt",
-    "Hölle",
-    "ich will sterben",
-    "Depression",
-    "depressiv",
-    "traurig",
-    "allein",
-    "einsam",
-]
+###
+# sensitive_topics = [
+#     "self-harm",
+#     "suicide",
+#     "kill myself",
+#     "threat",
+#     "abuse",
+#     "curse",
+#     "damn",
+#     "hell",
+#     "will sterben",
+#     "hurensohn",
+#     "Selbstmord",
+#     "Suizid",
+#     "töten",
+#     "Bedrohung",
+#     "Missbrauch",
+#     "Fluch",
+#     "verdammt",
+#     "Hölle",
+#     "ich will sterben",
+#     "Depression",
+#     "depressiv",
+#     "traurig",
+#     "allein",
+#     "einsam",
+# ]
 
-insults = [
-    "idiot",
-    "stupid",
-    "dumb",
-    "fool",
-    "shut up",
-    "loser",
-    "useless",
-    "worthless",
-    "hate you",
-    "fuck you",
-    "bastard",
-    "dumm",
-    "idiot",
-    "blöd",
-    "Narr",
-    "halt die Klappe",
-    "Verlierer",
-    "nutzlos",
-    "wertlos",
-    "ich hasse dich",
-    "Scheißkerl",
-]
+# insults = [
+#     "idiot",
+#     "stupid",
+#     "dumb",
+#     "fool",
+#     "shut up",
+#     "loser",
+#     "useless",
+#     "worthless",
+#     "hate you",
+#     "fuck you",
+#     "bastard",
+#     "dumm",
+#     "idiot",
+#     "blöd",
+#     "Narr",
+#     "halt die Klappe",
+#     "Verlierer",
+#     "nutzlos",
+#     "wertlos",
+#     "ich hasse dich",
+#     "Scheißkerl",
+# ]
 
-simple_inquiries = [
-    "hello",
-    "hi",
-    "how are you",
-    "what's up",
-    "who are you",
-    "tell me about yourself",
-    "what is your purpose",
-    "tell me a joke",
-    "hallo",
-    "hi",
-    "wie geht es dir",
-    "was ist los",
-    "wer bist du",
-    "erzähl mir von dir",
-    "was ist dein Zweck",
-    "erzähl mir einen Witz",
-]
+# simple_inquiries = [
+#     "hello",
+#     "hi",
+#     "how are you",
+#     "what's up",
+#     "who are you",
+#     "tell me about yourself",
+#     "what is your purpose",
+#     "tell me a joke",
+#     "hallo",
+#     "hi",
+#     "wie geht es dir",
+#     "was ist los",
+#     "wer bist du",
+#     "erzähl mir von dir",
+#     "was ist dein Zweck",
+#     "erzähl mir einen Witz",
+# ]
+###
+
+"""
+Proposal #3  Transfer these lists to file instead of having here for saving space.
+"""
+
+SENSITIVE_TOPICS = load_config("sensitive_topics.json")
+INSULTS = load_config("insults.json")
+SIMPLE_INQUIRIES = load_config("simple_inquiries.json")
 
 
 def get_emergency_response():
@@ -720,7 +907,7 @@ if user_input:
         with st.chat_message("assistant", avatar="parzivai.png"):
             st.markdown(translation_response.content)
         append_message_to_history("Assistant", translation_response.content)
-    elif any(topic in user_input.lower() for topic in sensitive_topics):
+    elif any(topic in user_input.lower() for topic in SENSITIVE_TOPICS):
         with st.chat_message("assistant"):
             st.markdown("⚠️ Trigger word detected - Providing emergency information.")
         emergency_response = get_emergency_response()
@@ -728,7 +915,7 @@ if user_input:
         with st.chat_message("assistant", avatar="⛔"):
             st.markdown(emergency_response)
         append_message_to_history("Assistant", emergency_response)
-    elif any(insult in user_input.lower() for insult in insults):
+    elif any(insult in user_input.lower() for insult in INSULTS):
         with st.chat_message("assistant"):
             st.markdown("🚫 Insult detected - Providing a response to insults.")
         insult_response = get_insult_response()
@@ -736,7 +923,7 @@ if user_input:
         with st.chat_message("assistant", avatar="⚠️"):
             st.markdown(insult_response)
         append_message_to_history("Assistant", insult_response)
-    elif any(inquiry in user_input.lower() for inquiry in simple_inquiries):
+    elif any(inquiry in user_input.lower() for inquiry in SIMPLE_INQUIRIES):
         with st.chat_message("assistant"):
             st.markdown("Direct response requested - Generating answer directly.")
         direct_response = llm.invoke([HumanMessage(content=user_input)])
