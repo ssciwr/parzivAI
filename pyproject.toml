@@ -23,12 +23,15 @@ classifiers = [
 ]
 dependencies = [
     "streamlit",
+    "streamlit-feedback",
     "pandas",
     "spacy",
     "spacy-streamlit",
     "langchain-community",
+    "langchain-huggingface",
     "pydantic",
     "selenium",
+    "playwright",
     "webdriver-manager",
     "beautifulsoup4",
     "requests",
