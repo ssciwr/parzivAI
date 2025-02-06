@@ -36,9 +36,3 @@ repos:
     rev: "v1.7.4"
     hooks:
       - id: actionlint
-
-  - repo: https://github.com/kynan/nbstripout
-    rev: 0.8.1
-    hooks:
-      - id: nbstripout # Make sure that Jupyter notebooks under version control have their outputs stripped before committing
-        files: ".ipynb"
