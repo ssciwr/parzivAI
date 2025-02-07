@@ -1,0 +1,16 @@
+black
+flake8
+ipykernel
+mypy
+myst-parser
+nbsphinx
+nbsphinx-link
+nbval
+pandas
+pre-commit
+pytest
+pytest-cov
+sphinx
+sphinx_mdinclude
+sphinx_rtd_theme
+sphinxcontrib-napoleon

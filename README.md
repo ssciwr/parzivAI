@@ -97,4 +97,3 @@ ParzivAI/
 ## Lizenz
 
 Dieses Projekt steht unter der MIT-Lizenz. Siehe die `LICENSE`-Datei für weitere Details.
-
