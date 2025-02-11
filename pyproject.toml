@@ -29,7 +29,7 @@ dependencies = [
     "spacy-streamlit",
     "langchain-community",
     "langchain-huggingface",
-    "langchain-ollama
+    "langchain-ollama",
     "pydantic",
     "selenium",
     "playwright",
