@@ -29,11 +29,14 @@ dependencies = [
     "spacy-streamlit",
     "langchain-community",
     "langchain-huggingface",
+    "langchain-ollama
     "pydantic",
     "selenium",
     "playwright",
     "webdriver-manager",
     "beautifulsoup4",
+    "tiktoken",
+    "faiss-cpu",
     "requests",
     "pytest"
 ]

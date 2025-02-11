@@ -17,7 +17,8 @@ from langchain_community.document_loaders import (
     CSVLoader,
 )
 from langchain_community.vectorstores import FAISS
-from langchain_community.chat_models import ChatOllama
+# from langchain_community.chat_models import ChatOllama
+from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain.schema import Document
@@ -33,21 +34,24 @@ from webdriver_manager.firefox import GeckoDriverManager
 import requests
 from bs4 import BeautifulSoup
 import asyncio
-
+import torch
 from datetime import datetime
-
+# avoid some torch incompatibility issues with newer Python versions
+# see https://github.com/SaiAkhil066/DeepSeek-RAG-Chatbot/issues/4
+torch.classes.__path__ = []
 # Set API keys
 # os.environ['TAVILY_API_KEY'] = 'xxx'
 
 # Page configuration (must be first Streamlit command)
 st.set_page_config(page_title="ParzivAI")
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(
+# tab1, tab2, tab3, tab4, tab5 = st.tabs(
+tab1, tab2, tab3, tab5 = st.tabs(
     [
         "ParzivAI Chatbot",
         "Bildersuche",
         "Linguistische Analyse",
-        "Lernquiz",
+        # "Lernquiz",
         "User Feedback",
     ]
 )
@@ -139,43 +143,35 @@ vectorstore_exists = os.path.exists(index_path)
 #             web_docs.extend(loader.load())
 #         except Exception as e:
 #             print(f"Error loading URL {url}: {e}")
-
 #     print(f"Loaded {len(web_docs)} documents from URLs.")
-
 #     pdf_folder = "./pdfs"
 #     pdf_loader = PyPDFDirectoryLoader(pdf_folder)
 #     pdf_docs = pdf_loader.load()
 #     print(f"Loaded {len(pdf_docs)} documents from PDFs.")
-
-#     csv = CSVLoader(file_path="texte.csv")
+#     csv = CSVLoader(file_path="data/Input_output_data_ParzivAI.csv")
 #     csv_docs = csv.load()
 #     print(f"Loaded {len(csv_docs)} documents from CSVs.")
-
 #     all_docs = web_docs + pdf_docs + csv_docs
 #     print(f"Total documents loaded: {len(all_docs)}")
-
 #     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
 #         chunk_size=768, chunk_overlap=30
 #     )
 #     doc_splits = text_splitter.split_documents(all_docs)
 #     print("Documents loaded and split successfully.")
-
 #     vectorstore = FAISS.from_documents(doc_splits, embd)
 #     vectorstore.save_local(persist_folder)
 #     print(f"FAISS index initialized and saved successfully in {persist_folder}.")
-
 #     return vectorstore
 ###
 
 ########
-"""
-Proposal #1:
-    A) Load URLs from  a JSON configuration file (as an example), instead of hardcoding them in the script
-    B) Load documents from  a specifically defined folder (e.g. static_data), for better organization
 
-    Additional comment on the A): In my notes I have the task " to delete the web-scraping part and api-keys, so it might mean that we don't need a URL loader at all.
-
-"""
+# Proposal #1:
+    # A) Load URLs from  a JSON configuration file (as an example), instead of hardcoding them in the script
+    # B) Load documents from  a specifically defined folder (e.g. static_data), for better organization
+# 
+    # Additional comment on the A): In my notes I have the task " to delete the web-scraping part and api-keys, so it might mean that we don't need a URL loader at all.
+# 
 
 
 def load_config(file_path):
@@ -193,11 +189,12 @@ def load_config(file_path):
 def load_documents_and_create_vectorstore():
     """Load documents from URLs and static files to create FAISS vector store."""
     # Load URLs
-    urls = load_config()
-
+    urls_data = load_config(file_path="urls.json")
+    print(urls)
     # Load documents from URLs
     web_docs = []
-    for url in urls:
+    for url in urls_data["urls"]:
+        print(f"Loading documents from URL: {url}")
         try:
             loader = WebBaseLoader(url)
             web_docs.extend(loader.load())
@@ -316,7 +313,8 @@ llm = ChatOllama(
     keep_alive=10,
     num_predict=400,
     top_p=0.91,
-    top_k=0.48,
+    top_k=48,
+    # top_k=0.48,
 )
 
 
@@ -487,11 +485,10 @@ def grade_generation_v_documents_and_question(question, documents, generation):
 ###
 
 ############
-"""
-Proposal #2:
-    Instead of having the link, hardcoded in the script, we can load it from a configuration file.
+# Proposal #2:
+    # Instead of having the link, hardcoded in the script, we can load it from a configuration file.
 
-"""
+
 # Load configuration from file
 CONFIG_PATH = "config.json"
 
@@ -586,7 +583,7 @@ st.write(
 )
 
 st.sidebar.title("Navigation")
-st.sidebar.image("parzivai.png", width=150)
+# st.sidebar.image("parzivai.png", width=150)
 
 if "cached_data" not in st.session_state:
     st.session_state.cached_data = {"embeddings": [], "prompts": [], "web_results": []}
@@ -859,9 +856,7 @@ def check_attributes(doc):
 # ]
 ###
 
-"""
-Proposal #3  Transfer these lists to file instead of having here for saving space.
-"""
+# Proposal #3  Transfer these lists to file instead of having here for saving space.
 
 SENSITIVE_TOPICS = load_config("sensitive_topics.json")
 INSULTS = load_config("insults.json")
@@ -1129,85 +1124,85 @@ with tab3:
     else:
         st.write("No POS tagging results available.")
 
-with tab4:
-    st.header("Lernquiz")
+# with tab4:
+#     st.header("Lernquiz")
 
-    # Load quiz data
-    @st.cache_data
-    def load_quiz_data():
-        with open("quiz_data.json", "r") as f:
-            return json.load(f)
+#     # Load quiz data
+#     @st.cache_data
+#     def load_quiz_data():
+#         with open("quiz_data.json", "r") as f:
+#             return json.load(f)
 
-    quiz_data = load_quiz_data()
+#     quiz_data = load_quiz_data()
 
-    # Define quiz functions
-    def restart_quiz():
-        st.session_state.current_index = 0
-        st.session_state.score = 0
-        st.session_state.answer_submitted = False
-        st.session_state.selected_option = None
+#     # Define quiz functions
+#     def restart_quiz():
+#         st.session_state.current_index = 0
+#         st.session_state.score = 0
+#         st.session_state.answer_submitted = False
+#         st.session_state.selected_option = None
 
-    def submit_answer():
-        st.session_state.answer_submitted = True
-        if (
-            st.session_state.selected_option
-            == quiz_data[st.session_state.current_index]["answer"]
-        ):
-            st.session_state.score += 10
+#     def submit_answer():
+#         st.session_state.answer_submitted = True
+#         if (
+#             st.session_state.selected_option
+#             == quiz_data[st.session_state.current_index]["answer"]
+#         ):
+#             st.session_state.score += 10
 
-    def next_question():
-        st.session_state.current_index += 1
-        st.session_state.answer_submitted = False
-        st.session_state.selected_option = None
+#     def next_question():
+#         st.session_state.current_index += 1
+#         st.session_state.answer_submitted = False
+#         st.session_state.selected_option = None
 
-    if "current_index" not in st.session_state:
-        restart_quiz()
+#     if "current_index" not in st.session_state:
+#         restart_quiz()
 
-    if "selected_option" not in st.session_state:
-        st.session_state.selected_option = None
+#     if "selected_option" not in st.session_state:
+#         st.session_state.selected_option = None
 
-    # Title and Description
-    st.title("Streamlit Quiz App")
+#     # Title and Description
+#     st.title("Streamlit Quiz App")
 
-    # Progress Bar and Score Display
-    progress_bar_value = (st.session_state.current_index + 1) / len(quiz_data)
-    st.metric(label="Score", value=f"{st.session_state.score} / {len(quiz_data) * 10}")
-    st.progress(progress_bar_value)
+#     # Progress Bar and Score Display
+#     progress_bar_value = (st.session_state.current_index + 1) / len(quiz_data)
+#     st.metric(label="Score", value=f"{st.session_state.score} / {len(quiz_data) * 10}")
+#     st.progress(progress_bar_value)
 
-    # Displaying the Question and Answer Options
-    question_item = quiz_data[st.session_state.current_index]
-    st.subheader(f"Question {st.session_state.current_index + 1}")
-    st.title(f"{question_item['question']}")
+#     # Displaying the Question and Answer Options
+#     question_item = quiz_data[st.session_state.current_index]
+#     st.subheader(f"Question {st.session_state.current_index + 1}")
+#     st.title(f"{question_item['question']}")
 
-    options = question_item["options"]
-    correct_answer = question_item["answer"]
+#     options = question_item["options"]
+#     correct_answer = question_item["answer"]
 
-    if st.session_state.answer_submitted:
-        for option in options:
-            if option == correct_answer:
-                st.success(f"{option} (Correct answer)")
-            elif option == st.session_state.selected_option:
-                st.error(f"{option} (Incorrect answer)")
-            else:
-                st.write(option)
-    else:
-        selected_option = st.radio(
-            label="Select an option:",
-            options=options,
-            key=f"selected_option_{st.session_state.current_index}",
-        )
+#     if st.session_state.answer_submitted:
+#         for option in options:
+#             if option == correct_answer:
+#                 st.success(f"{option} (Correct answer)")
+#             elif option == st.session_state.selected_option:
+#                 st.error(f"{option} (Incorrect answer)")
+#             else:
+#                 st.write(option)
+    # else:
+    #     selected_option = st.radio(
+    #         label="Select an option:",
+    #         options=options,
+    #         key=f"selected_option_{st.session_state.current_index}",
+    #     )
 
-        if st.button("Submit"):
-            st.session_state.selected_option = selected_option
-            submit_answer()
+    #     if st.button("Submit"):
+    #         st.session_state.selected_option = selected_option
+    #         submit_answer()
 
-    if st.session_state.answer_submitted:
-        if st.session_state.current_index < len(quiz_data) - 1:
-            if st.button("Next"):
-                next_question()
-        else:
-            st.write(
-                f"Quiz completed! Your score is: {st.session_state.score} / {len(quiz_data) * 10}"
-            )
-            if st.button("Restart"):
-                restart_quiz()
+    # if st.session_state.answer_submitted:
+    #     if st.session_state.current_index < len(quiz_data) - 1:
+    #         if st.button("Next"):
+    #             next_question()
+    #     else:
+    #         st.write(
+    #             f"Quiz completed! Your score is: {st.session_state.score} / {len(quiz_data) * 10}"
+    #         )
+    #         if st.button("Restart"):
+    #             restart_quiz()
