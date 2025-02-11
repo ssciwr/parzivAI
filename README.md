@@ -7,6 +7,7 @@
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ssciwr/parzivAI/blob/main/example_notebooks/demo.ipynb)
 
 **_This project is currently under development!_**
+*For the German overview, please see [here](README_German.md)*
 
 ParzivAI is an interactive chatbot designed to answer questions related to medieval history and the Middle High German language and literature. In addition to the chat functionality, ParzivAI offers linguistic analysis tools, an image search feature, and an interactive quiz on historical topics.
 
