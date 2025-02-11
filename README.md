@@ -1,28 +1,14 @@
+# ParzivAI: AI-based assistent for medieval history and middle high German
+![License: MIT](https://img.shields.io/github/license/ssciwr/parzivAI)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/ssciwr/parzivAI/ci.yml?branch=main)
+![codecov](https://img.shields.io/codecov/c/github/ssciwr/parzivAI)
+![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ssciwr_parzivAI&metric=alert_status)
+![Language](https://img.shields.io/github/languages/top/ssciwr/parzivAI)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ssciwr/parzivAI/blob/main/example_notebooks/demo.ipynb)
 
-# Title
+**_This project is currently under development!_**
 
-Description
-
-
-## Installation instructions
-
-## Usage
-
-
-# ParzivAI: AI-Assisted Chatbot for Medieval History and Middle High German
-# ParzivAI: KI-basierter Assistent für Mittelalterliche Geschichte und Mittelhochdeutsche Sprache
-
-## Overview / Übersicht
-
-### English
 ParzivAI is an interactive chatbot designed to answer questions related to medieval history and the Middle High German language and literature. In addition to the chat functionality, ParzivAI offers linguistic analysis tools, an image search feature, and an interactive quiz on historical topics.
-
-### Deutsch
-ParzivAI ist ein interaktiver Chatbot, der entwickelt wurde, um Fragen zur mittelalterlichen Geschichte und zur mittelhochdeutschen Sprache und Literatur zu beantworten. Neben der Chat-Funktion bietet ParzivAI linguistische Analysetools, eine Bildersuchfunktion und ein interaktives Quiz zu historischen Themen.
-
-## Functions / Funktionen
-
-### English
 
 - **Chatbot:** Interact with ParzivAI to receive detailed answers to historical and linguistic questions.
 - **Linguistic Analysis:** Automatically perform part-of-speech tagging for both modern German and Middle High German texts.
@@ -30,147 +16,60 @@ ParzivAI ist ein interaktiver Chatbot, der entwickelt wurde, um Fragen zur mitte
 - **Quiz:** Test your knowledge of the Middle Ages with an interactive quiz.
 - **Feedback:** Provide feedback on the quality of the responses directly in the app.
 
-### Deutsch
+## Installation instructions
 
-- **Chatbot:** Interagiere mit ParzivAI, um detaillierte Antworten zu historischen und sprachlichen Fragen zu erhalten.
-- **Linguistische Analyse:** Automatische Part-of-Speech-Tagging für moderne deutsche und mittelhochdeutsche Texte.
-- **Bildersuche:** Suche nach themenspezifischen historischen Bildern.
-- **Quiz:** Teste Dein Wissen über das Mittelalter in einem interaktiven Lernquiz.
-- **Feedback:** Teile Feedback zur Qualität der Antworten direkt in der App.
-
-## Installation
-
-### Requirements / Voraussetzungen
-
-#### English
-Ensure that Python 3.8 or higher is installed. Install all dependencies with:
-
+Ensure that Python 3.8 or higher is installed. It is recommended to use conda environments. In your conda (or other Python) environment, install parzivAI from the GitHub repository:
 ```bash
-pip install -r requirements.txt
+pip install pip install git+https://github.com/ssciwr/parzivAI
 ```
-
-#### Deutsch
-Stelle sicher, dass Python 3.8 oder höher installiert ist. Installiere alle Abhängigkeiten mit:
-
-```bash
-pip install -r requirements.txt
-```
-
-### Spacy Models / Spacy-Modelle
-
-#### English
-For modern German texts, you need the Spacy model de_core_news_sm. Install it with:
-
+parzivAI makes use from [spaCy](https://spacy.io/) under the hood. Download the required spaCy models using 
 ```bash
 python -m spacy download de_core_news_sm
 ```
+(*TODO: Download models on the fly if not found through the spacy cli*)
 
-For Middle High German, a specially trained model must be loaded, and its path integrated into the code.
-
-#### Deutsch
-
-Für moderne deutsche Texte benötigst Du das Spacy-Modell `de_core_news_sm`. Installiere es mit:
-
-```bash
-python -m spacy download de_core_news_sm
-```
-
-Für Mittelhochdeutsch muss ein speziell trainiertes Modell geladen und der Pfad in den Code integriert werden.
+For Middle High German, a specially trained model must be loaded, and its path needs to be integrated into the code.
+(*TODO: Make sure this is platform-agnostic and can also be done on-the-fly*)
 
 ### Playwright Setup
+(*TODO: Do we still want to include playwright?*)
 
-#### English
 If you use the Playwright library for image search, execute the following command:
 
 ```bash
 playwright install
 ```
 
-#### Deutsch
-Wenn Du die Playwright-Bibliothek für die Bildersuche verwendest, führe diesen Befehl aus:
-
-```bash
-playwright install
-```
-
-## Usage / Verwendung
-
-### Starting the Local Server / Lokalen Server starten
-
-#### English
+## Usage 
 Start the application with the following command:
 
 ```bash
 streamlit run app.py
 ```
-
 Then open your browser and navigate to `http://localhost:8501`.
+(*TODO: Check port number and exceptions*)
 
-#### Deutsch
-Starte die Anwendung mit dem folgenden Befehl:
 
-```bash
-streamlit run app.py
-```
-
-Öffne Deinen Browser und navigiere zu `http://localhost:8501`.
-
-### Features / Funktionalitäten
-
-#### English
-1. **Chatbot:** Ask questions about medieval history, linguistics, or literature.
-2. **Linguistic Analysis:** Apply part-of-speech tagging to both modern German and Middle High German texts.
-3. **Image Search:** Search for images related to historical themes.
-4. **Quiz:** Test your knowledge of the Middle Ages with an interactive quiz.
-
-#### Deutsch
-1. **Chatbot:** Stelle Fragen zu mittelalterlicher Geschichte, Linguistik oder Literatur.
-2. **Linguistische Analyse:** Wende POS-Tagging (Part-of-Speech) auf moderne und mittelhochdeutsche Texte an.
-3. **Bildersuche:** Suche nach Bildern, die mit historischen Themen in Verbindung stehen.
-4. **Quiz:** Teste Dein Wissen über das Mittelalter in einem Lernquiz.
-
-## API Key / API-Schlüssel
-### English
+## API Key 
 Ensure that your Tavily API key is set as an environment variable:
-
 ```bash
 export TAVILY_API_KEY='your_api_key_here'
 ```
 
-### Deutsch
-Stelle sicher, dass Dein Tavily API-Schlüssel als Umgebungsvariable gesetzt ist:
-
-```bash
-export TAVILY_API_KEY='your_api_key_here'
-```
-
-## Project Structure / Projektstruktur
+## Project structure
 ### English
 ```
 ParzivAI/
 │
 ├── parzivai/main.py           # Main Streamlit application
-├── requirements-dev.txt       # Dependencies
-├── README.md                  # Documentation
+├── pyproject.toml             # Installation file and dependencies
+├── requirements-dev.txt       # Developer dependencies
+├── README.md                  # Overview
 ├── example_notebooks/         # Usage examples
 ├── docs/                      # Documentation
 ```
 
-
-### Deutsch
-```
-ParzivAI/
-│
-├── parzivai/main.py           # Hauptanwendung für Streamlit
-├── requirements-dev.txt       # Abhängigkeiten
-├── README.md                  # Dokumentation
-├── example_notebooks/         # Verwendungsbeispiele
-├── docs/                      # Dokumentation
-```
-
-## License / Lizenz
-### English
+## License 
 This project is licensed under the MIT License. See the `LICENSE` file for further details.
 
-### Deutsch
-Dieses Projekt steht unter der MIT-Lizenz. Siehe die `LICENSE`-Datei für weitere Details.
+(*TODO: Further components of the documentation*)
