@@ -74,3 +74,4 @@ ParzivAI/
 This project is licensed under the MIT License. See the `LICENSE` file for further details.
 
 (*TODO: Further components of the documentation*)
+
