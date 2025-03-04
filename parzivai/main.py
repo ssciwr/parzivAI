@@ -1,6 +1,7 @@
 """
 Global proposal:
 If we have time, split the code into multiple files for better organization and readability. Also, it would be good to split code into classes and functions for better modularity and reusability.
+For example, each tab functionality could be its own module.
 """
 
 import os
@@ -17,6 +18,7 @@ from langchain_community.document_loaders import (
     CSVLoader,
 )
 from langchain_community.vectorstores import FAISS
+# deprecated
 # from langchain_community.chat_models import ChatOllama
 from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage, AIMessage
@@ -314,6 +316,7 @@ llm = ChatOllama(
     num_predict=400,
     top_p=0.91,
     top_k=48,
+    # outdated format <1
     # top_k=0.48,
 )
 
@@ -322,7 +325,8 @@ llm = ChatOllama(
 def grade_document(question: str, document: str) -> str:
     prompt = f"User question: {question}\n\nRetrieved document: {document}\n\nIs this document relevant to the user's question? Please answer 'yes' or 'no'."
     print(f"Grading document with prompt: {prompt}")
-    response = llm.invoke([HumanMessage(content=prompt)])
+    # response = llm.invoke([HumanMessage(content=prompt)])
+    response = llm.invoke(("human", prompt))
     print(f"LLM response: {response.content}")
     return (
         "yes"
@@ -346,7 +350,8 @@ def generate_answer(question, documents, messages):
         [doc.page_content if isinstance(doc, Document) else doc for doc in documents]
     )
     prompt = f"User question: {question}\n\nContext from documents: {context}\n\nPlease provide a detailed and informative answer based on the context provided."
-    messages.append(HumanMessage(content=prompt))
+    # messages.append(HumanMessage(content=prompt))
+    messages.append(("human", prompt))
 
     generation = llm.invoke(messages)
     messages[-1].content = generation.content
@@ -359,7 +364,8 @@ def generate_answer(question, documents, messages):
 
 
 def llm_fallback_answer(question):
-    messages = [HumanMessage(content=question), AIMessage(content="")]
+    # messages = [HumanMessage(content=question), AIMessage(content="")]
+    messages = [("human", question), AIMessage(content="")]
     generation = llm.invoke(messages)
     messages[-1].content = generation.content
 
@@ -664,7 +670,8 @@ def append_message_to_history(role, message):
 
 for message in st.session_state["messages"]:
     role = "user" if isinstance(message, HumanMessage) else "assistant"
-    content = message.content
+    # content = message.content
+    content = message[1]
     avatar = "parzivai.png" if role == "assistant" else None
     with st.chat_message(role, avatar=avatar):
         st.markdown(content)
@@ -882,7 +889,8 @@ def get_insult_response():
 user_input = st.chat_input("Ask ParzivAI a question:")
 
 if user_input:
-    st.session_state.messages.append(HumanMessage(content=user_input))
+    # st.session_state.messages.append(HumanMessage(content=user_input))
+    st.session_state.messages.append(("human", user_input))
     with st.chat_message("user"):
         st.markdown(user_input)
     append_message_to_history("User", user_input)
@@ -895,7 +903,9 @@ if user_input:
             st.markdown(
                 "🔄 Übersetzung angefordert - Antwort wird direkt durch ParzivAI generiert"
             )
-        translation_response = llm.invoke([HumanMessage(content=user_input)])
+        # translation_response = llm.invoke([HumanMessage(content=user_input)])
+        translation_response = llm.invoke(("human", user_input))
+        print(translation_response)
         st.session_state.messages.append(
             AIMessage(content=translation_response.content)
         )
@@ -921,7 +931,8 @@ if user_input:
     elif any(inquiry in user_input.lower() for inquiry in SIMPLE_INQUIRIES):
         with st.chat_message("assistant"):
             st.markdown("Direct response requested - Generating answer directly.")
-        direct_response = llm.invoke([HumanMessage(content=user_input)])
+        # direct_response = llm.invoke([HumanMessage(content=user_input)])
+        direct_response = llm.invoke(("human", user_input))
         st.session_state.messages.append(AIMessage(content=direct_response.content))
         with st.chat_message("assistant", avatar="parzivai.png"):
             st.markdown(direct_response.content)

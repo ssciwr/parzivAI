@@ -32,6 +32,12 @@ python -m spacy download de_core_news_sm
 For Middle High German, a specially trained model must be loaded, and its path needs to be integrated into the code.
 (*TODO: Make sure this is platform-agnostic and can also be done on-the-fly*)
 
+You will also need the Ollama chatbot, that you can install using
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+on linux OS, for other OS please refer to the [Ollama installation guide](https://ollama.com/download).
+
 ### Playwright Setup
 (*TODO: Do we still want to include playwright?*)
 
@@ -69,6 +75,10 @@ ParzivAI/
 ├── example_notebooks/         # Usage examples
 ├── docs/                      # Documentation
 ```
+
+## Create models
+Download models using ollama or from Hugging Face. You can use `ollama create my-model` in the model directory to add the model to the local ollama model library (on Linux, stored in `/usr/share/ollama/.ollama/models`, on Windows in `~/.ollama/models`). Test the ollama model using the `ollama run my-model` command. Ollama can use various model formats for input, see [here](https://github.com/ollama/ollama/blob/main/docs/import.md).
+
 
 ## License 
 This project is licensed under the MIT License. See the `LICENSE` file for further details.
