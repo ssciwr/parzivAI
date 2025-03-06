@@ -31,21 +31,26 @@ You phrase all of your answers so that they don't exceed 350 tokens.
 
 # Initialize LLM
 llm = ChatOllama(
-    model="parzivai1",
+    # model="parzivai1",
+    # model="deepseek-r1",
+    model="llama3",
     temperature=1.1,
-    system_prompt=SYSTEM_PROMPT,
+    # system_prompt=SYSTEM_PROMPT,
     keep_alive=10,
     num_predict=400,
     top_p=0.91,
     top_k=48,
     # top_k=0.48,
 )
+messages = [
+                ("system", "You are a helpful translator. Translate the user sentence to French."),
+                ("human", "I love programming."),
+            ]
 
-
-ai = AIMessage(content="")
-human = HumanMessage(content="Hallo ich winke")
-messages = [human, ai]
-# generation = llm.invoke(messages)
-generation = llm.invoke(("human", "Hallo"))
+# ai = AIMessage(content="")
+# human = HumanMessage(content="Hallo ich winke")
+# messages = [human, ai]
+generation = llm.invoke(messages)
+# generation = llm.invoke(("human", "Hallo"))
 print(generation)
 print("end")

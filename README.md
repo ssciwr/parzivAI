@@ -77,7 +77,7 @@ ParzivAI/
 ```
 
 ## Create models
-Download models using ollama or from Hugging Face. You can use `ollama create my-model` in the model directory to add the model to the local ollama model library (on Linux, stored in `/usr/share/ollama/.ollama/models`, on Windows in `~/.ollama/models`). Test the ollama model using the `ollama run my-model` command. Ollama can use various model formats for input, see [here](https://github.com/ollama/ollama/blob/main/docs/import.md).
+Download models using ollama (`ollama pull my-model`) or from Hugging Face. You can use `ollama create my-model` in the model directory to add the model to the local ollama model library (on Linux, stored in `/usr/share/ollama/.ollama/models`, on Windows in `~/.ollama/models`). Test the ollama model using the `ollama run my-model` command. Ollama can use various model formats for input, see [here](https://github.com/ollama/ollama/blob/main/docs/import.md).
 
 
 ## License 
