@@ -16,7 +16,6 @@ os.makedirs(persist_folder, exist_ok=True)
 
 # Check if the FAISS index already exists
 index_path = os.path.join(persist_folder, "index.faiss")
-vectorstore_exists = os.path.exists(index_path)
 
 
 # load the documents for the vector store
@@ -90,7 +89,8 @@ def load_documents_and_create_vectorstore(emdb):
     return vectorstore
 
 
-def get_vectorstore(vectorstore_exists):
+def get_vectorstore():
+    vectorstore_exists = os.path.exists(index_path)
     if vectorstore_exists:
         try:
             vectorstore = FAISS.load_local(

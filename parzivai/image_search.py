@@ -87,6 +87,3 @@ async def display_images(topic: str):
             caption=f"Bildthema: {data['name']}, Archivnummer: {data['archiveNumber']}, URL: {data['url']}",
             use_column_width=True,
         )
-
-
-############

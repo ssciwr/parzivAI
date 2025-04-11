@@ -24,53 +24,6 @@ POS_DESCRIPTIONS = {
     "X": "Other",
 }
 
-with st.sidebar.expander("POS Tag Descriptions"):
-    for pos, desc in POS_DESCRIPTIONS.items():
-        st.write(f"{pos}: {desc}")
-
-
-def append_message_to_history(role, message):
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = pd.concat(
-            [
-                st.session_state.chat_history,
-                pd.DataFrame(
-                    {
-                        "Chat_Timestamp": [datetime.now()],
-                        "Chat_Role": [role],
-                        "Chat_Message": [message],
-                    }
-                ),
-            ],
-            ignore_index=True,
-        )
-
-
-for message in st.session_state["messages"]:
-    role = "user" if isinstance(message, HumanMessage) else "assistant"
-    # content = message.content
-    content = message[1]
-    avatar = "parzivai.png" if role == "assistant" else None
-    with st.chat_message(role, avatar=avatar):
-        st.markdown(content)
-    append_message_to_history(role, content)
-
-####
-try:
-    nlp_modern = spacy.load("de_core_news_sm")
-except Exception as e:
-    st.error(f"Could not load modern German model: {e}")
-    nlp_modern = None
-
-try:
-    nlp_mhg = spacy.load(
-        "/mnt/data/rx262/chatbot/Spacy-Model-for-Middle-High-German/models/model-best"
-    )
-    nlp_mhg.add_pipe("sentencizer")
-except Exception as e:
-    st.error(f"Could not load Middle High German model: {e}")
-    nlp_mhg = None
-
 TAG_TO_POS = {
     "$_": "SYM",
     "--": "PUNCT",
@@ -146,6 +99,20 @@ TAG_TO_POS = {
     "VVPP": "VERB",
     "VVPS": "VERB",
 }
+
+
+try:
+    nlp_modern = spacy.load("de_core_news_sm")
+except Exception as e:
+    st.error(f"Could not load modern German model: {e}")
+    nlp_modern = None
+
+try:
+    nlp_mhg = spacy.load("../../Spacy-Model-for-Middle-High-German/models/model-best")
+    nlp_mhg.add_pipe("sentencizer")
+except Exception as e:
+    st.error(f"Could not load Middle High German model: {e}")
+    nlp_mhg = None
 
 
 def pos_tagging_modern(text):
