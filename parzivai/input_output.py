@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 import spacy
 import spacy_streamlit
-from typing import List
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import (
@@ -12,25 +11,13 @@ from langchain_community.document_loaders import (
     CSVLoader,
 )
 from langchain_community.vectorstores import FAISS
-# deprecated
-# from langchain_community.chat_models import ChatOllama
-from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage, AIMessage
-from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain.schema import Document
-from urllib.parse import quote, urljoin
-from pydantic import BaseModel, Field
+from urllib.parse import quote
 from streamlit_feedback import streamlit_feedback
 import json
-import playwright
 from playwright.async_api import async_playwright
-from selenium import webdriver
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from webdriver_manager.firefox import GeckoDriverManager
-import requests
-from bs4 import BeautifulSoup
 import asyncio
-import torch
 from datetime import datetime
 
 # Define persistent folder for FAISS index
@@ -40,6 +27,7 @@ os.makedirs(persist_folder, exist_ok=True)
 # Check if the FAISS index already exists
 index_path = os.path.join(persist_folder, "index.faiss")
 vectorstore_exists = os.path.exists(index_path)
+
 
 # load the documents for the vector store
 def load_config(file_path):
@@ -53,6 +41,7 @@ def load_config(file_path):
         st.error(f"Error decoding configuration file: {e}")
         return {}
 
+
 @st.cache_resource
 def load_embeddings_model():
     model_name_hf = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
@@ -63,6 +52,7 @@ def load_embeddings_model():
         model_kwargs=model_kwargs_hf,
         encode_kwargs=encode_kwargs_hf,
     )
+
 
 def load_documents_and_create_vectorstore(emdb):
     """Load documents from URLs and static files to create FAISS vector store."""
@@ -114,7 +104,9 @@ def get_vectorstore(vectorstore_exists):
     if vectorstore_exists:
         try:
             vectorstore = FAISS.load_local(
-                persist_folder, load_embeddings_model(), allow_dangerous_deserialization=True
+                persist_folder,
+                load_embeddings_model(),
+                allow_dangerous_deserialization=True,
             )
             print(f"FAISS index loaded successfully from {persist_folder}.")
         except Exception as e:
@@ -126,8 +118,6 @@ def get_vectorstore(vectorstore_exists):
 
     retriever = vectorstore.as_retriever()
     return retriever
-
-
 
 
 @st.cache_data(ttl=3600)
@@ -283,7 +273,7 @@ def grade_generation_v_documents_and_question(question, documents, generation):
 
 ############
 # Proposal #2:
-    # Instead of having the link, hardcoded in the script, we can load it from a configuration file.
+# Instead of having the link, hardcoded in the script, we can load it from a configuration file.
 
 
 # Load configuration from file
@@ -987,24 +977,24 @@ with tab3:
 #                 st.error(f"{option} (Incorrect answer)")
 #             else:
 #                 st.write(option)
-    # else:
-    #     selected_option = st.radio(
-    #         label="Select an option:",
-    #         options=options,
-    #         key=f"selected_option_{st.session_state.current_index}",
-    #     )
+# else:
+#     selected_option = st.radio(
+#         label="Select an option:",
+#         options=options,
+#         key=f"selected_option_{st.session_state.current_index}",
+#     )
 
-    #     if st.button("Submit"):
-    #         st.session_state.selected_option = selected_option
-    #         submit_answer()
+#     if st.button("Submit"):
+#         st.session_state.selected_option = selected_option
+#         submit_answer()
 
-    # if st.session_state.answer_submitted:
-    #     if st.session_state.current_index < len(quiz_data) - 1:
-    #         if st.button("Next"):
-    #             next_question()
-    #     else:
-    #         st.write(
-    #             f"Quiz completed! Your score is: {st.session_state.score} / {len(quiz_data) * 10}"
-    #         )
-    #         if st.button("Restart"):
-    #             restart_quiz()
+# if st.session_state.answer_submitted:
+#     if st.session_state.current_index < len(quiz_data) - 1:
+#         if st.button("Next"):
+#             next_question()
+#     else:
+#         st.write(
+#             f"Quiz completed! Your score is: {st.session_state.score} / {len(quiz_data) * 10}"
+#         )
+#         if st.button("Restart"):
+#             restart_quiz()

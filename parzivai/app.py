@@ -1,43 +1,12 @@
 import os
 import streamlit as st
 import pandas as pd
-import spacy
 import spacy_streamlit
-from typing import List
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import (
-    WebBaseLoader,
-    PyPDFDirectoryLoader,
-    CSVLoader,
-)
-from langchain_community.vectorstores import FAISS
-# deprecated
-# from langchain_community.chat_models import ChatOllama
-from langchain_ollama import ChatOllama
-from langchain_core.messages import HumanMessage, AIMessage
-from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain.schema import Document
-from urllib.parse import quote, urljoin
-from pydantic import BaseModel, Field
 from streamlit_feedback import streamlit_feedback
-import json
-import playwright
-from playwright.async_api import async_playwright
-from selenium import webdriver
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from webdriver_manager.firefox import GeckoDriverManager
-import requests
-from bs4 import BeautifulSoup
 import asyncio
-import torch
 from datetime import datetime
 from input_output import get_vectorstore
-# avoid some torch incompatibility issues with newer Python versions
-# see https://github.com/SaiAkhil066/DeepSeek-RAG-Chatbot/issues/4
-torch.classes.__path__ = []
-# Set API keys
-# os.environ['TAVILY_API_KEY'] = 'xxx'
+
 
 retriever = get_vectorstore()
 
@@ -70,7 +39,6 @@ div.stButton > button:first-child {
 """,
     unsafe_allow_html=True,
 )
-
 
 
 st.title("ParzivAI")
@@ -259,24 +227,24 @@ with tab3:
 #                 st.error(f"{option} (Incorrect answer)")
 #             else:
 #                 st.write(option)
-    # else:
-    #     selected_option = st.radio(
-    #         label="Select an option:",
-    #         options=options,
-    #         key=f"selected_option_{st.session_state.current_index}",
-    #     )
+# else:
+#     selected_option = st.radio(
+#         label="Select an option:",
+#         options=options,
+#         key=f"selected_option_{st.session_state.current_index}",
+#     )
 
-    #     if st.button("Submit"):
-    #         st.session_state.selected_option = selected_option
-    #         submit_answer()
+#     if st.button("Submit"):
+#         st.session_state.selected_option = selected_option
+#         submit_answer()
 
-    # if st.session_state.answer_submitted:
-    #     if st.session_state.current_index < len(quiz_data) - 1:
-    #         if st.button("Next"):
-    #             next_question()
-    #     else:
-    #         st.write(
-    #             f"Quiz completed! Your score is: {st.session_state.score} / {len(quiz_data) * 10}"
-    #         )
-    #         if st.button("Restart"):
-    #             restart_quiz()
+# if st.session_state.answer_submitted:
+#     if st.session_state.current_index < len(quiz_data) - 1:
+#         if st.button("Next"):
+#             next_question()
+#     else:
+#         st.write(
+#             f"Quiz completed! Your score is: {st.session_state.score} / {len(quiz_data) * 10}"
+#         )
+#         if st.button("Restart"):
+#             restart_quiz()
