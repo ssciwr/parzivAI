@@ -3,7 +3,7 @@ import pytest
 
 @pytest.fixture
 def get_app():
-    return AppTest.from_file("main.py")
+    return AppTest.from_file("app.py")
 
 
 def test_run_app(get_app):

@@ -77,7 +77,7 @@ Then open your browser and navigate to `http://localhost:8501`.
 ```
 ParzivAI/
 │
-├── parzivai/main.py           # Main Streamlit application
+├── parzivai/app.py           # Main Streamlit application
 ├── pyproject.toml             # Installation file and dependencies
 ├── requirements-dev.txt       # Developer dependencies
 ├── README.md                  # Overview
