@@ -153,7 +153,11 @@ def grade_generation_v_documents_and_question(question, documents, generation):
     score = grade_document(question, generation)
     return "useful" if score == "yes" else "not useful"
 
-
+# TODO the below function and all related functions need to be 
+# refactored
+# they are needlessly complex and entangled
+# the message passing from the LLM to the user does not work in streamlit,
+# only shows up in the terminal
 def process_user_input(user_input):
     # st.session_state.messages.append(HumanMessage(content=user_input))
     st.session_state.messages.append(("human", user_input))

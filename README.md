@@ -29,14 +29,23 @@ python -m spacy download de_core_news_sm
 ```
 (*TODO: Download models on the fly if not found through the spacy cli*)
 
-For Middle High German, a specially trained model must be loaded, and its path needs to be integrated into the code.
+For Middle High German, a specially trained model must be loaded, and its path needs to be integrated into the code. The model can be found [here](https://github.com/Middle-High-German-Conceptual-Database/Spacy-Model-for-Middle-High-German). Git clone the repository and place it in the same folder as the parzivAI repo:
+```
+you-folder/
+│
+├── parzivai                                 # parzivai 
+├── Spacy-Model-for-Middle-High-German       # spaCy model
+```
 (*TODO: Make sure this is platform-agnostic and can also be done on-the-fly*)
 
 You will also need the Ollama chatbot, that you can install using
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
 ```
-on linux OS, for other OS please refer to the [Ollama installation guide](https://ollama.com/download).
+on linux OS, for other OS please refer to the [Ollama installation guide](https://ollama.com/download). The default model used by parzivAI is the llama3.2:1b model that you need to download using
+```
+ollama pull llama3.2:1b
+```
 
 ### Playwright Setup
 (*TODO: Do we still want to include playwright?*)
@@ -47,8 +56,14 @@ If you use the Playwright library for image search, execute the following comman
 playwright install
 ```
 
+## API Key 
+Ensure that your Tavily API key is set as an environment variable:
+```bash
+export TAVILY_API_KEY='your_api_key_here'
+```
+
 ## Usage 
-Start the application with the following command:
+Cd into the `parzivai` package folder and start the application with the following command:
 
 ```bash
 streamlit run app.py
@@ -56,12 +71,6 @@ streamlit run app.py
 Then open your browser and navigate to `http://localhost:8501`.
 (*TODO: Check port number and exceptions*)
 
-
-## API Key 
-Ensure that your Tavily API key is set as an environment variable:
-```bash
-export TAVILY_API_KEY='your_api_key_here'
-```
 
 ## Project structure
 ### English
