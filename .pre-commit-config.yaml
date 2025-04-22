@@ -27,6 +27,7 @@ repos:
       - id: requirements-txt-fixer
       # Apply a file size limit of 500kB
       - id: check-added-large-files
+        exclude: "parzivai/parzival.png"
       # Simple parser validation of e.g. pyproject.toml
       - id: check-toml
       # Unify file endings
