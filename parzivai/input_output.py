@@ -9,9 +9,12 @@ from langchain_community.document_loaders import (
 )
 from langchain_community.vectorstores import FAISS
 import json
+from  importlib import resources
 
+PKG = resources.files("parzivai")
+FILE_PATH = PKG / "data" 
 # Define persistent folder for FAISS index
-persist_folder = "faiss_index4"
+persist_folder = FILE_PATH / "faiss_index4"
 os.makedirs(persist_folder, exist_ok=True)
 
 # Check if the FAISS index already exists
@@ -19,12 +22,12 @@ index_path = os.path.join(persist_folder, "index.faiss")
 
 
 # load the documents for the vector store
-def load_config(file_path):
+def load_config(file):
     try:
-        with open(file_path, "r") as file:
+        with open(FILE_PATH / file, "r") as file:
             return json.load(file)
     except FileNotFoundError:
-        st.error(f"Configuration file not found: {file_path}")
+        st.error(f"Configuration file not found: {FILE_PATH / file}")
         return {}
     except json.JSONDecodeError as e:
         st.error(f"Error decoding configuration file: {e}")
@@ -43,10 +46,10 @@ def load_embeddings_model():
     )
 
 
-def load_documents_and_create_vectorstore(emdb):
+def load_documents_and_create_vectorstore():
     """Load documents from URLs and static files to create FAISS vector store."""
     # Load URLs
-    urls_data = load_config(file_path="urls.json")
+    urls_data = load_config(file="urls.json")
     # Load documents from URLs
     web_docs = []
     for url in urls_data["urls"]:

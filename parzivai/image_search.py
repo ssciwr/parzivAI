@@ -3,9 +3,10 @@ from urllib.parse import quote
 import json
 from playwright.async_api import async_playwright
 import asyncio
-
+from importlib import resources
 # Load configuration from file
-CONFIG_PATH = "config.json"
+PKG = resources.files("parzivai")
+CONFIG_PATH = PKG / "data" / "config.json"
 
 try:
     with open(CONFIG_PATH, "r") as config_file:
@@ -21,7 +22,7 @@ except json.JSONDecodeError as e:
     raise
 
 
-def adjust_image_url(base_url: str, url: str) -> str:
+def adjust_image_url(url: str) -> str:
     """Adjust image URL parameters for higher resolution."""
     if "WID=400" in url and "HEI=400" in url:
         url = url.replace("WID=400", "WID=1000").replace("HEI=400", "HEI=1000")

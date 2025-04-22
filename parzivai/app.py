@@ -17,7 +17,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 from chat_models import instantiate_llm, get_emergency_response, get_insult_response
 from chat_models import SENSITIVE_TOPICS, INSULTS, SIMPLE_INQUIRIES
 from text_tagging import pos_tagging_mhg, pos_tagging_modern
-
+from importlib import resources
 # avoid some torch incompatibility issues with newer Python versions
 # see https://github.com/SaiAkhil066/DeepSeek-RAG-Chatbot/issues/4
 torch.classes.__path__ = []
@@ -27,8 +27,11 @@ torch.classes.__path__ = []
 # os.environ['TAVILY_API_KEY'] = 'xxx'
 # Initialize web search tool
 web_search_tool = TavilySearchResults()
+# set data file path
+PKG = resources.files("parzivai")
+FILE_PATH = PKG / "data"
 st.set_page_config(page_title="ParzivAI")
-avatar = "parzival.png"
+avatar = str(FILE_PATH / "parzival.png")
 tab1, tab2, tab3, tab4 = st.tabs(
     [
         "ParzivAI Chatbot",
@@ -66,7 +69,6 @@ def retrieve(question):
 def grade_document(question: str, document: str) -> str:
     prompt = f"User question: {question}\n\nRetrieved document: {document}\n\nIs this document relevant to the user's question? Please answer 'yes' or 'no'."
     print(f"Grading document with prompt: {prompt}")
-    # response = llm.invoke([HumanMessage(content=prompt)])
     response = llm.invoke(("human", prompt))
     print(f"LLM response: {response.content}")
     return (
@@ -81,7 +83,6 @@ def generate_answer(question, documents, messages):
         [doc.page_content if isinstance(doc, Document) else doc for doc in documents]
     )
     prompt = f"User question: {question}\n\nContext from documents: {context}\n\nPlease provide a detailed and informative answer based on the context provided."
-    # messages.append(HumanMessage(content=prompt))
     messages.append(("human", prompt))
 
     generation = llm.invoke(messages)
@@ -149,7 +150,7 @@ def decide_route(question):
         return web_search_results | {"route_taken": "WebSearch"}
 
 
-def grade_generation_v_documents_and_question(question, documents, generation):
+def grade_generation_v_documents_and_question(question, generation):
     score = grade_document(question, generation)
     return "useful" if score == "yes" else "not useful"
 
@@ -173,7 +174,6 @@ def process_user_input(user_input):
             st.markdown(
                 "🔄 Übersetzung angefordert - Antwort wird direkt durch ParzivAI generiert"
             )
-        # translation_response = llm.invoke([HumanMessage(content=user_input)])
         translation_response = llm.invoke(("human", user_input))
         print(translation_response)
         st.session_state.messages.append(
@@ -201,7 +201,6 @@ def process_user_input(user_input):
     elif any(inquiry in user_input.lower() for inquiry in SIMPLE_INQUIRIES):
         with st.chat_message("assistant"):
             st.markdown("Direct response requested - Generating answer directly.")
-        # direct_response = llm.invoke([HumanMessage(content=user_input)])
         direct_response = llm.invoke(("human", user_input))
         st.session_state.messages.append(AIMessage(content=direct_response.content))
         with st.chat_message("assistant", avatar=avatar):
@@ -318,7 +317,7 @@ if __name__ == "__main__":
         "ParzivAI helps you with questions about the Middle Ages and Middle High German language and literature."
     )
     st.sidebar.title("Navigation")
-    st.sidebar.image("parzival.png", width=150)
+    st.sidebar.image(avatar, width=150)
     retriever = get_vectorstore()
     llm = instantiate_llm()
     user_input = st.chat_input("Ask ParzivAI a question:")
@@ -371,7 +370,6 @@ if __name__ == "__main__":
 
     for message in st.session_state["messages"]:
         role = "user" if isinstance(message, HumanMessage) else "assistant"
-        # content = message.content
         content = message[1]
         avatar = avatar if role == "assistant" else None
         with st.chat_message(role, avatar=avatar):

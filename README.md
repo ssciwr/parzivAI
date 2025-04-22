@@ -78,11 +78,17 @@ Then open your browser and navigate to `http://localhost:8501`.
 ParzivAI/
 │
 ├── parzivai/app.py           # Main Streamlit application
-├── pyproject.toml             # Installation file and dependencies
-├── requirements-dev.txt       # Developer dependencies
-├── README.md                  # Overview
-├── example_notebooks/         # Usage examples
-├── docs/                      # Documentation
+├── parzivai/chat_models.py   # parzivai chat models module
+├── parzivai/image_search.py  # parzivai image search module
+├── parzivai/input_output.py  # parzivai input output handling module
+├── parzivai/text_tagging.py  # parzivai syntactic annotations module
+├── parzivai/data/*.json      # parzivai data and configuration files
+├── parzivai/test/*.py        # parzivai unit and integration/system/end-to-end tests
+├── pyproject.toml            # Installation file and dependencies
+├── requirements-dev.txt      # Developer dependencies
+├── README.md                 # Overview
+├── example_notebooks/        # Usage examples
+├── docs/                     # Documentation
 ```
 
 ## Create models
