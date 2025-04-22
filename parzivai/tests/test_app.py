@@ -7,5 +7,6 @@ def get_app():
 
 
 def test_run_app(get_app):
-    get_app.run()
+    get_app.run(timeout=10)
+    assert get_app.title == "ParzivAI"
     assert not get_app.exception
