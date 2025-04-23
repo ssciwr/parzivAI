@@ -79,7 +79,14 @@ class GraphState(BaseModel):
 
 
 # Initialize LLM
-def instantiate_llm():
+def instantiate_llm(model: str = model) -> ChatOllama:
+    """
+    Instantiate the LLM with the specified model and parameters.
+    Args:
+        model (str): The model to use for the LLM.
+    Returns:
+        ChatOllama: The instantiated LLM.
+    """
     llm = ChatOllama(
         model=model,
         temperature=temperature,
