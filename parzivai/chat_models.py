@@ -1,13 +1,11 @@
-import streamlit as st
-import pandas as pd
 from typing import List
 from langchain_ollama import ChatOllama
 from pydantic import BaseModel, Field
-from input_output import load_config
+from parzivai.input_output import load_config, FILE_PATH
 
 # select the model you want to use
 # small model for testing
-model = "llama3.2:1b"
+MODEL = "llama3.2:1b"
 # or provide the path to a model, in this case the llm needs to be invoked using
 # model_path = (
 #     "/usr/share/ollama/.ollama/models/manifests/registry.ollama.ai/library/llama3.2/1b"
@@ -81,7 +79,14 @@ class GraphState(BaseModel):
 
 
 # Initialize LLM
-def instantiate_llm():
+def instantiate_llm(model: str = MODEL) -> ChatOllama:
+    """
+    Instantiate the LLM with the specified model and parameters.
+    Args:
+        model (str): The model to use for the LLM.
+    Returns:
+        ChatOllama: The instantiated LLM.
+    """
     llm = ChatOllama(
         model=model,
         temperature=temperature,
@@ -95,7 +100,7 @@ def instantiate_llm():
 
 def get_emergency_response():
     try:
-        with open("emergency.txt", "r") as file:
+        with open(FILE_PATH / "emergency.txt", "r") as file:
             return file.read()
     except FileNotFoundError:
         return "Emergency contact information is not available at the moment."
@@ -103,7 +108,7 @@ def get_emergency_response():
 
 def get_insult_response():
     try:
-        with open("insults.txt", "r") as file:
+        with open(FILE_PATH / "insults.txt", "r") as file:
             return file.read()
     except FileNotFoundError:
         return "Insult response information is not available at the moment."

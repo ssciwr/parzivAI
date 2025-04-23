@@ -1,4 +1,6 @@
 import os
+import json
+from importlib import resources
 import streamlit as st
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -8,11 +10,9 @@ from langchain_community.document_loaders import (
     CSVLoader,
 )
 from langchain_community.vectorstores import FAISS
-import json
-from  importlib import resources
 
 PKG = resources.files("parzivai")
-FILE_PATH = PKG / "data" 
+FILE_PATH = PKG / "data"
 # Define persistent folder for FAISS index
 persist_folder = FILE_PATH / "faiss_index4"
 os.makedirs(persist_folder, exist_ok=True)

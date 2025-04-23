@@ -1,10 +1,6 @@
 [build-system]
-requires = [
-    "setuptools",
-    "wheel",
-    "pybind11[global]>=2.10.0",
-]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
 
 [project]
 name = "parzivai"
@@ -27,18 +23,14 @@ dependencies = [
     "pandas",
     "spacy",
     "spacy-streamlit",
+    "faiss-cpu",
     "langchain-community",
     "langchain-huggingface",
     "langchain-ollama",
     "pydantic",
-    "selenium",
     "playwright",
-    "webdriver-manager",
-    "beautifulsoup4",
-    "tiktoken",
-    "faiss-cpu",
-    "requests",
-    "pytest"
+    "pytest",
+    "tiktoken"
 ]
 
 [tool.setuptools.packages.find]

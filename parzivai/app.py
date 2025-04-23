@@ -1,45 +1,49 @@
 import os
-import streamlit as st
+import asyncio
+from importlib import resources
+import torch
 import pandas as pd
+from datetime import datetime
+import streamlit as st
+from streamlit_feedback import streamlit_feedback
 import spacy_streamlit
 from langchain.schema import Document
 from langchain_community.tools.tavily_search import TavilySearchResults
-
-from streamlit_feedback import streamlit_feedback
-import asyncio
-from datetime import datetime
-from input_output import get_vectorstore, load_embeddings_model
-from image_search import display_images
-from text_tagging import check_attributes
-import torch
-from text_tagging import POS_DESCRIPTIONS
 from langchain_core.messages import HumanMessage, AIMessage
-from chat_models import instantiate_llm, get_emergency_response, get_insult_response
-from chat_models import SENSITIVE_TOPICS, INSULTS, SIMPLE_INQUIRIES
-from text_tagging import pos_tagging_mhg, pos_tagging_modern
-from importlib import resources
+
+st.set_page_config(page_title="ParzivAI")
+from parzivai.input_output import get_vectorstore, load_embeddings_model
+from parzivai.image_search import display_images
+from parzivai.text_tagging import (
+    check_attributes,
+    POS_DESCRIPTIONS,
+    pos_tagging_mhg,
+    pos_tagging_modern,
+)
+from parzivai.chat_models import (
+    instantiate_llm,
+    get_emergency_response,
+    get_insult_response,
+    SENSITIVE_TOPICS,
+    INSULTS,
+    SIMPLE_INQUIRIES,
+)
+
 # avoid some torch incompatibility issues with newer Python versions
 # see https://github.com/SaiAkhil066/DeepSeek-RAG-Chatbot/issues/4
 torch.classes.__path__ = []
-# Page configuration (must be first Streamlit command)
 
 # Set API keys
-# os.environ['TAVILY_API_KEY'] = 'xxx'
+if not os.getenv("TAVILY_API_KEY"):
+    os.environ["TAVILY_API_KEY"] = "xxx"
 # Initialize web search tool
 web_search_tool = TavilySearchResults()
 # set data file path
 PKG = resources.files("parzivai")
 FILE_PATH = PKG / "data"
-st.set_page_config(page_title="ParzivAI")
-avatar = str(FILE_PATH / "parzival.png")
-tab1, tab2, tab3, tab4 = st.tabs(
-    [
-        "ParzivAI Chatbot",
-        "Bildersuche",
-        "Linguistische Analyse",
-        "User Feedback",
-    ]
-)
+AVATAR_IMAGE = str(FILE_PATH / "parzival.png")
+retriever = get_vectorstore()
+llm = instantiate_llm()
 
 
 def append_message_to_history(role, message):
@@ -154,7 +158,8 @@ def grade_generation_v_documents_and_question(question, generation):
     score = grade_document(question, generation)
     return "useful" if score == "yes" else "not useful"
 
-# TODO the below function and all related functions need to be 
+
+# TODO the below function and all related functions need to be
 # refactored
 # they are needlessly complex and entangled
 # the message passing from the LLM to the user does not work in streamlit,
@@ -179,7 +184,7 @@ def process_user_input(user_input):
         st.session_state.messages.append(
             AIMessage(content=translation_response.content)
         )
-        with st.chat_message("assistant", avatar=avatar):
+        with st.chat_message("assistant", avatar=AVATAR_IMAGE):
             st.markdown(translation_response.content)
         append_message_to_history("Assistant", translation_response.content)
     elif any(topic in user_input.lower() for topic in SENSITIVE_TOPICS):
@@ -203,7 +208,7 @@ def process_user_input(user_input):
             st.markdown("Direct response requested - Generating answer directly.")
         direct_response = llm.invoke(("human", user_input))
         st.session_state.messages.append(AIMessage(content=direct_response.content))
-        with st.chat_message("assistant", avatar=avatar):
+        with st.chat_message("assistant", avatar=AVATAR_IMAGE):
             st.markdown(direct_response.content)
         append_message_to_history("Assistant", direct_response.content)
     else:
@@ -267,7 +272,7 @@ def process_user_input(user_input):
         assistant_message += f"\n\n{route_message}"
 
         st.session_state.messages.append(AIMessage(content=assistant_message))
-        with st.chat_message("assistant", avatar=avatar):
+        with st.chat_message("assistant", avatar=AVATAR_IMAGE):
             st.markdown(assistant_message)
         append_message_to_history("Assistant", assistant_message)
 
@@ -298,8 +303,17 @@ def update_chat_history(role, message):
     )
 
 
-if __name__ == "__main__":
+def main():
     # Main function to run the Streamlit app
+    # Page configuration (must be first Streamlit command)
+    tab1, tab2, tab3, tab4 = st.tabs(
+        [
+            "ParzivAI Chatbot",
+            "Bildersuche",
+            "Linguistische Analyse",
+            "User Feedback",
+        ]
+    )
     # Apply custom CSS
     st.markdown(
         """
@@ -317,9 +331,7 @@ if __name__ == "__main__":
         "ParzivAI helps you with questions about the Middle Ages and Middle High German language and literature."
     )
     st.sidebar.title("Navigation")
-    st.sidebar.image(avatar, width=150)
-    retriever = get_vectorstore()
-    llm = instantiate_llm()
+    st.sidebar.image(AVATAR_IMAGE, width=150)
     user_input = st.chat_input("Ask ParzivAI a question:")
     if user_input:
         process_user_input(user_input)
@@ -371,8 +383,10 @@ if __name__ == "__main__":
     for message in st.session_state["messages"]:
         role = "user" if isinstance(message, HumanMessage) else "assistant"
         content = message[1]
-        avatar = avatar if role == "assistant" else None
-        with st.chat_message(role, avatar=avatar):
+        avatar_icon = (
+            AVATAR_IMAGE if role == "assistant" else None
+        )  # Use a different variable name
+        with st.chat_message(role, avatar=avatar_icon):
             st.markdown(content)
         append_message_to_history(role, content)
 
@@ -381,7 +395,7 @@ if __name__ == "__main__":
         assistant_response = st.session_state.messages[-1].content
         doc = pos_tagging_modern(assistant_response)
         if doc:
-            st.session_state.linguistic_analysis = f("Modernes Deutsch", doc)
+            st.session_state.linguistic_analysis = ("Modernes Deutsch", doc)
             st.experimental_update()  # Ensure the interface updates
 
     if st.button("POS-Tagging (Mittelhochdeutsch)"):
@@ -485,3 +499,8 @@ if __name__ == "__main__":
             st.write(feedback_df)
         else:
             st.write("No feedback received yet.")
+
+
+if __name__ == "__main__":
+    # Run the main function
+    main()
