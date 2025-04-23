@@ -4,6 +4,7 @@ import json
 from playwright.async_api import async_playwright
 import asyncio
 from importlib import resources
+
 # Load configuration from file
 PKG = resources.files("parzivai")
 CONFIG_PATH = PKG / "data" / "config.json"

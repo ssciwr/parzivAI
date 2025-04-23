@@ -23,7 +23,7 @@ Ensure that Python 3.8 or higher is installed. It is recommended to use conda en
 ```bash
 pip install pip install git+https://github.com/ssciwr/parzivAI
 ```
-parzivAI makes use from [spaCy](https://spacy.io/) under the hood. Download the required spaCy models using 
+parzivAI makes use from [spaCy](https://spacy.io/) under the hood. Download the required spaCy models using
 ```bash
 python -m spacy download de_core_news_sm
 ```
@@ -33,7 +33,7 @@ For Middle High German, a specially trained model must be loaded, and its path n
 ```
 you-folder/
 │
-├── parzivai                                 # parzivai 
+├── parzivai                                 # parzivai
 ├── Spacy-Model-for-Middle-High-German       # spaCy model
 ```
 (*TODO: Make sure this is platform-agnostic and can also be done on-the-fly*)
@@ -56,13 +56,13 @@ If you use the Playwright library for image search, execute the following comman
 playwright install
 ```
 
-## API Key 
+## API Key
 Ensure that your Tavily API key is set as an environment variable:
 ```bash
 export TAVILY_API_KEY='your_api_key_here'
 ```
 
-## Usage 
+## Usage
 Cd into the `parzivai` package folder and start the application with the following command:
 
 ```bash
@@ -97,8 +97,7 @@ Download models using ollama (`ollama pull my-model`) or from Hugging Face. You 
 Test the ollama model using the `ollama run my-model` command. Ollama can use various model formats for input, see [here](https://github.com/ollama/ollama/blob/main/docs/import.md).
 
 
-## License 
+## License
 This project is licensed under the MIT License. See the `LICENSE` file for further details.
 
 (*TODO: Further components of the documentation*)
-
