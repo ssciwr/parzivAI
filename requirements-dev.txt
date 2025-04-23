@@ -7,7 +7,6 @@ myst-parser
 nbsphinx
 nbsphinx-link
 nbval
-pandas
 pre-commit
 pytest
 pytest-cov
