@@ -33,7 +33,7 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Install Python package and run tests
       run: |
-        python -m pip install -v .
+        python -m pip install -e .
         python -m pip install -r requirements-dev.txt
         cd parzivai
         python -m pytest -svv --cov=. --cov-report=xml
