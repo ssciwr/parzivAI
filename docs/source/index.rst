@@ -13,4 +13,4 @@ parzivAI documentation
    intro
    intro_German
    license_link
-
+   parzivai
