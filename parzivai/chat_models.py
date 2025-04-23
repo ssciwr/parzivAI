@@ -1,9 +1,7 @@
-import streamlit as st
-import pandas as pd
 from typing import List
 from langchain_ollama import ChatOllama
 from pydantic import BaseModel, Field
-from input_output import load_config
+from parzivai.input_output import load_config, FILE_PATH
 
 # select the model you want to use
 # small model for testing
@@ -95,7 +93,7 @@ def instantiate_llm():
 
 def get_emergency_response():
     try:
-        with open("emergency.txt", "r") as file:
+        with open(FILE_PATH / "emergency.txt", "r") as file:
             return file.read()
     except FileNotFoundError:
         return "Emergency contact information is not available at the moment."
@@ -103,7 +101,7 @@ def get_emergency_response():
 
 def get_insult_response():
     try:
-        with open("insults.txt", "r") as file:
+        with open(FILE_PATH / "insults.txt", "r") as file:
             return file.read()
     except FileNotFoundError:
         return "Insult response information is not available at the moment."
