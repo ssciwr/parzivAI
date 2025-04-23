@@ -29,7 +29,8 @@ dependencies = [
     "langchain-ollama",
     "pydantic",
     "playwright",
-    "pytest"
+    "pytest",
+    "tiktoken"
 ]
 
 [tool.setuptools.packages.find]
