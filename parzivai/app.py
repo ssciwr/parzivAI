@@ -34,7 +34,8 @@ from parzivai.chat_models import (
 torch.classes.__path__ = []
 
 # Set API keys
-# os.environ['TAVILY_API_KEY'] = 'xxx'
+if not os.getenv("TAVILY_API_KEY"):
+    os.environ["TAVILY_API_KEY"] = "xxx"
 # Initialize web search tool
 web_search_tool = TavilySearchResults()
 # set data file path
