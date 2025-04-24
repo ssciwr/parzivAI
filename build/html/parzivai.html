@@ -1,0 +1,450 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>streamlit app module &mdash; parzivAI 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="License" href="license_link.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            parzivAI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">ParzivAI: AI-based assistent for medieval history and middle high German</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro_German.html">ParzivAI: KI-basierter Assistent für Mittelalterliche Geschichte und Mittelhochdeutsche Sprache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license_link.html">License</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">streamlit app module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#app.append_message_to_history"><code class="docutils literal notranslate"><span class="pre">append_message_to_history()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.decide_route"><code class="docutils literal notranslate"><span class="pre">decide_route()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.generate_answer"><code class="docutils literal notranslate"><span class="pre">generate_answer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.grade_document"><code class="docutils literal notranslate"><span class="pre">grade_document()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.grade_documents"><code class="docutils literal notranslate"><span class="pre">grade_documents()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.grade_generation_v_documents_and_question"><code class="docutils literal notranslate"><span class="pre">grade_generation_v_documents_and_question()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.llm_fallback_answer"><code class="docutils literal notranslate"><span class="pre">llm_fallback_answer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.process_user_input"><code class="docutils literal notranslate"><span class="pre">process_user_input()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.retrieve"><code class="docutils literal notranslate"><span class="pre">retrieve()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.update_chat_history"><code class="docutils literal notranslate"><span class="pre">update_chat_history()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.web_search"><code class="docutils literal notranslate"><span class="pre">web_search()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#module-chat_models">chat models module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#chat_models.GradeAnswer"><code class="docutils literal notranslate"><span class="pre">GradeAnswer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.GradeAnswer.binary_score"><code class="docutils literal notranslate"><span class="pre">GradeAnswer.binary_score</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.GradeAnswer.model_config"><code class="docutils literal notranslate"><span class="pre">GradeAnswer.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#chat_models.GradeDocuments"><code class="docutils literal notranslate"><span class="pre">GradeDocuments</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.GradeDocuments.binary_score"><code class="docutils literal notranslate"><span class="pre">GradeDocuments.binary_score</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.GradeDocuments.model_config"><code class="docutils literal notranslate"><span class="pre">GradeDocuments.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#chat_models.GradeHallucinations"><code class="docutils literal notranslate"><span class="pre">GradeHallucinations</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.GradeHallucinations.binary_score"><code class="docutils literal notranslate"><span class="pre">GradeHallucinations.binary_score</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.GradeHallucinations.model_config"><code class="docutils literal notranslate"><span class="pre">GradeHallucinations.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#chat_models.GraphState"><code class="docutils literal notranslate"><span class="pre">GraphState</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.GraphState.documents"><code class="docutils literal notranslate"><span class="pre">GraphState.documents</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.GraphState.generation"><code class="docutils literal notranslate"><span class="pre">GraphState.generation</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.GraphState.model_config"><code class="docutils literal notranslate"><span class="pre">GraphState.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.GraphState.question"><code class="docutils literal notranslate"><span class="pre">GraphState.question</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#chat_models.Vectorstore"><code class="docutils literal notranslate"><span class="pre">Vectorstore</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.Vectorstore.model_config"><code class="docutils literal notranslate"><span class="pre">Vectorstore.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.Vectorstore.query"><code class="docutils literal notranslate"><span class="pre">Vectorstore.query</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#chat_models.WebSearch"><code class="docutils literal notranslate"><span class="pre">WebSearch</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.WebSearch.model_config"><code class="docutils literal notranslate"><span class="pre">WebSearch.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chat_models.WebSearch.query"><code class="docutils literal notranslate"><span class="pre">WebSearch.query</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#chat_models.get_emergency_response"><code class="docutils literal notranslate"><span class="pre">get_emergency_response()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chat_models.get_insult_response"><code class="docutils literal notranslate"><span class="pre">get_insult_response()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chat_models.instantiate_llm"><code class="docutils literal notranslate"><span class="pre">instantiate_llm()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#module-image_search">image search module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#image_search.adjust_image_url"><code class="docutils literal notranslate"><span class="pre">adjust_image_url()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#image_search.construct_image_search_url"><code class="docutils literal notranslate"><span class="pre">construct_image_search_url()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#image_search.display_images"><code class="docutils literal notranslate"><span class="pre">display_images()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#image_search.fetch_images"><code class="docutils literal notranslate"><span class="pre">fetch_images()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#module-input_output">IO handling module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#input_output.get_vectorstore"><code class="docutils literal notranslate"><span class="pre">get_vectorstore()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input_output.load_config"><code class="docutils literal notranslate"><span class="pre">load_config()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input_output.load_documents_and_create_vectorstore"><code class="docutils literal notranslate"><span class="pre">load_documents_and_create_vectorstore()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input_output.load_embeddings_model"><code class="docutils literal notranslate"><span class="pre">load_embeddings_model()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#module-text_tagging">annotations module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#text_tagging.check_attributes"><code class="docutils literal notranslate"><span class="pre">check_attributes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#text_tagging.pos_tagging_mhg"><code class="docutils literal notranslate"><span class="pre">pos_tagging_mhg()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#text_tagging.pos_tagging_modern"><code class="docutils literal notranslate"><span class="pre">pos_tagging_modern()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">parzivAI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">streamlit app module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/parzivai.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-app">
+<span id="streamlit-app-module"></span><h1>streamlit app module<a class="headerlink" href="#module-app" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.append_message_to_history">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">append_message_to_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">role</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.append_message_to_history" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.decide_route">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">decide_route</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.decide_route" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.generate_answer">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">generate_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">documents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.generate_answer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.grade_document">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">grade_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#app.grade_document" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.grade_documents">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">grade_documents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">documents</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.grade_documents" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.grade_generation_v_documents_and_question">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">grade_generation_v_documents_and_question</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generation</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.grade_generation_v_documents_and_question" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.llm_fallback_answer">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">llm_fallback_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.llm_fallback_answer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.main">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.process_user_input">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">process_user_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.process_user_input" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.retrieve">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">retrieve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.retrieve" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.update_chat_history">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">update_chat_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">role</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.update_chat_history" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.web_search">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">web_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.web_search" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-chat_models">
+<span id="chat-models-module"></span><h1>chat models module<a class="headerlink" href="#module-chat_models" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="chat_models.GradeAnswer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chat_models.</span></span><span class="sig-name descname"><span class="pre">GradeAnswer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#chat_models.GradeAnswer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.GradeAnswer.binary_score">
+<span class="sig-name descname"><span class="pre">binary_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#chat_models.GradeAnswer.binary_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.GradeAnswer.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#chat_models.GradeAnswer.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chat_models.GradeDocuments">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chat_models.</span></span><span class="sig-name descname"><span class="pre">GradeDocuments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#chat_models.GradeDocuments" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.GradeDocuments.binary_score">
+<span class="sig-name descname"><span class="pre">binary_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#chat_models.GradeDocuments.binary_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.GradeDocuments.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#chat_models.GradeDocuments.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chat_models.GradeHallucinations">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chat_models.</span></span><span class="sig-name descname"><span class="pre">GradeHallucinations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#chat_models.GradeHallucinations" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.GradeHallucinations.binary_score">
+<span class="sig-name descname"><span class="pre">binary_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#chat_models.GradeHallucinations.binary_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.GradeHallucinations.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#chat_models.GradeHallucinations.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chat_models.GraphState">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chat_models.</span></span><span class="sig-name descname"><span class="pre">GraphState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">documents</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#chat_models.GraphState" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.GraphState.documents">
+<span class="sig-name descname"><span class="pre">documents</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#chat_models.GraphState.documents" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.GraphState.generation">
+<span class="sig-name descname"><span class="pre">generation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#chat_models.GraphState.generation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.GraphState.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#chat_models.GraphState.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.GraphState.question">
+<span class="sig-name descname"><span class="pre">question</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#chat_models.GraphState.question" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chat_models.Vectorstore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chat_models.</span></span><span class="sig-name descname"><span class="pre">Vectorstore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#chat_models.Vectorstore" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.Vectorstore.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#chat_models.Vectorstore.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.Vectorstore.query">
+<span class="sig-name descname"><span class="pre">query</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#chat_models.Vectorstore.query" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="chat_models.WebSearch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chat_models.</span></span><span class="sig-name descname"><span class="pre">WebSearch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#chat_models.WebSearch" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.WebSearch.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#chat_models.WebSearch.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="chat_models.WebSearch.query">
+<span class="sig-name descname"><span class="pre">query</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#chat_models.WebSearch.query" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chat_models.get_emergency_response">
+<span class="sig-prename descclassname"><span class="pre">chat_models.</span></span><span class="sig-name descname"><span class="pre">get_emergency_response</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chat_models.get_emergency_response" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chat_models.get_insult_response">
+<span class="sig-prename descclassname"><span class="pre">chat_models.</span></span><span class="sig-name descname"><span class="pre">get_insult_response</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#chat_models.get_insult_response" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chat_models.instantiate_llm">
+<span class="sig-prename descclassname"><span class="pre">chat_models.</span></span><span class="sig-name descname"><span class="pre">instantiate_llm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'llama3.2:1b'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ChatOllama</span></span></span><a class="headerlink" href="#chat_models.instantiate_llm" title="Link to this definition"></a></dt>
+<dd><p>Instantiate the LLM with the specified model and parameters.
+:param model: The model to use for the LLM.
+:type model: str</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ChatOllama</strong> – The instantiated LLM.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-image_search">
+<span id="image-search-module"></span><h1>image search module<a class="headerlink" href="#module-image_search" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="image_search.adjust_image_url">
+<span class="sig-prename descclassname"><span class="pre">image_search.</span></span><span class="sig-name descname"><span class="pre">adjust_image_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#image_search.adjust_image_url" title="Link to this definition"></a></dt>
+<dd><p>Adjust image URL parameters for higher resolution.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="image_search.construct_image_search_url">
+<span class="sig-prename descclassname"><span class="pre">image_search.</span></span><span class="sig-name descname"><span class="pre">construct_image_search_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#image_search.construct_image_search_url" title="Link to this definition"></a></dt>
+<dd><p>Construct the search URL for the hardcoded site.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="image_search.display_images">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">image_search.</span></span><span class="sig-name descname"><span class="pre">display_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#image_search.display_images" title="Link to this definition"></a></dt>
+<dd><p>Display fetched images in Streamlit.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="image_search.fetch_images">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">image_search.</span></span><span class="sig-name descname"><span class="pre">fetch_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#image_search.fetch_images" title="Link to this definition"></a></dt>
+<dd><p>Fetch images related to a topic from the hardcoded site.</p>
+</dd></dl>
+
+</section>
+<section id="module-input_output">
+<span id="io-handling-module"></span><h1>IO handling module<a class="headerlink" href="#module-input_output" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="input_output.get_vectorstore">
+<span class="sig-prename descclassname"><span class="pre">input_output.</span></span><span class="sig-name descname"><span class="pre">get_vectorstore</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#input_output.get_vectorstore" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="input_output.load_config">
+<span class="sig-prename descclassname"><span class="pre">input_output.</span></span><span class="sig-name descname"><span class="pre">load_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#input_output.load_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="input_output.load_documents_and_create_vectorstore">
+<span class="sig-prename descclassname"><span class="pre">input_output.</span></span><span class="sig-name descname"><span class="pre">load_documents_and_create_vectorstore</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#input_output.load_documents_and_create_vectorstore" title="Link to this definition"></a></dt>
+<dd><p>Load documents from URLs and static files to create FAISS vector store.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="input_output.load_embeddings_model">
+<span class="sig-prename descclassname"><span class="pre">input_output.</span></span><span class="sig-name descname"><span class="pre">load_embeddings_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#input_output.load_embeddings_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-text_tagging">
+<span id="annotations-module"></span><h1>annotations module<a class="headerlink" href="#module-text_tagging" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="text_tagging.check_attributes">
+<span class="sig-prename descclassname"><span class="pre">text_tagging.</span></span><span class="sig-name descname"><span class="pre">check_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#text_tagging.check_attributes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="text_tagging.pos_tagging_mhg">
+<span class="sig-prename descclassname"><span class="pre">text_tagging.</span></span><span class="sig-name descname"><span class="pre">pos_tagging_mhg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#text_tagging.pos_tagging_mhg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="text_tagging.pos_tagging_modern">
+<span class="sig-prename descclassname"><span class="pre">text_tagging.</span></span><span class="sig-name descname"><span class="pre">pos_tagging_modern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#text_tagging.pos_tagging_modern" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="license_link.html" class="btn btn-neutral float-left" title="License" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Scientific Software Center, Heidelberg University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

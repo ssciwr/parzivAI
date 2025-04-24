@@ -1,0 +1,193 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ParzivAI: KI-basierter Assistent für Mittelalterliche Geschichte und Mittelhochdeutsche Sprache &mdash; parzivAI 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="License" href="license_link.html" />
+    <link rel="prev" title="ParzivAI: AI-based assistent for medieval history and middle high German" href="intro.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            parzivAI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">ParzivAI: AI-based assistent for medieval history and middle high German</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ParzivAI: KI-basierter Assistent für Mittelalterliche Geschichte und Mittelhochdeutsche Sprache</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installationsanweisungen">Installationsanweisungen</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#playwright-setup">Playwright Setup</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#verwendung">Verwendung</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-schlussel">API-Schlüssel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#projektstruktur">Projektstruktur</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lizenz">Lizenz</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license_link.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parzivai.html">streamlit app module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parzivai.html#module-chat_models">chat models module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parzivai.html#module-image_search">image search module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parzivai.html#module-input_output">IO handling module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parzivai.html#module-text_tagging">annotations module</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">parzivAI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">ParzivAI: KI-basierter Assistent für Mittelalterliche Geschichte und Mittelhochdeutsche Sprache</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/intro_German.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="parzivai-ki-basierter-assistent-fur-mittelalterliche-geschichte-und-mittelhochdeutsche-sprache">
+<h1>ParzivAI: KI-basierter Assistent für Mittelalterliche Geschichte und Mittelhochdeutsche Sprache<a class="headerlink" href="#parzivai-ki-basierter-assistent-fur-mittelalterliche-geschichte-und-mittelhochdeutsche-sprache" title="Link to this heading"></a></h1>
+<p><img alt="License: MIT" src="https://img.shields.io/github/license/ssciwr/parzivAI" />
+<img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/ssciwr/parzivAI/ci.yml?branch=main" />
+<img alt="codecov" src="https://img.shields.io/codecov/c/github/ssciwr/parzivAI" />
+<img alt="Quality Gate Status" src="https://sonarcloud.io/api/project_badges/measure?project=ssciwr_parzivAI&amp;metric=alert_status" />
+<img alt="Language" src="https://img.shields.io/github/languages/top/ssciwr/parzivAI" />
+<a class="reference external" href="https://colab.research.google.com/github/ssciwr/parzivAI/blob/main/example_notebooks/demo.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<p><strong><em>Dieses Projekt befindet sich aktuell unter aktiver Entwicklung!</em></strong></p>
+<p>ParzivAI ist ein interaktiver Chatbot, der entwickelt wurde, um Fragen zur mittelalterlichen Geschichte und zur mittelhochdeutschen Sprache und Literatur zu beantworten. Neben der Chat-Funktion bietet ParzivAI linguistische Analysetools, eine Bildersuchfunktion und ein interaktives Quiz zu historischen Themen.</p>
+<ul class="simple">
+<li><p><strong>Chatbot:</strong> Interagiere mit ParzivAI, um detaillierte Antworten zu historischen und sprachlichen Fragen zu erhalten.</p></li>
+<li><p><strong>Linguistische Analyse:</strong> Automatische Part-of-Speech-Tagging für moderne deutsche und mittelhochdeutsche Texte.</p></li>
+<li><p><strong>Bildersuche:</strong> Suche nach themenspezifischen historischen Bildern.</p></li>
+<li><p><strong>Quiz:</strong> Teste Dein Wissen über das Mittelalter in einem interaktiven Lernquiz.</p></li>
+<li><p><strong>Feedback:</strong> Teile Feedback zur Qualität der Antworten direkt in der App.</p></li>
+</ul>
+<section id="installationsanweisungen">
+<h2>Installationsanweisungen<a class="headerlink" href="#installationsanweisungen" title="Link to this heading"></a></h2>
+<p>Stelle sicher, dass Python 3.8 oder höher installiert ist. Es ist empfohlen, conda Umgebungen zu nutzen. In deiner conda (oder anderer Python) Umgebung, installiere parzivAI vom GitHub Repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/ssciwr/parzivAI
+</pre></div>
+</div>
+<p>parzivAI nutzt <a class="reference external" href="https://spacy.io/">spaCy</a> für die Textverarbeitung. Lade die benötigten spaCy Modelle herunter mit</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>spacy<span class="w"> </span>download<span class="w"> </span>de_core_news_sm
+</pre></div>
+</div>
+<p>Für Mittelhochdeutsch muss ein speziell trainiertes Modell geladen und der Pfad in den Code integriert werden.</p>
+<section id="playwright-setup">
+<h3>Playwright Setup<a class="headerlink" href="#playwright-setup" title="Link to this heading"></a></h3>
+<p>Wenn Du die Playwright-Bibliothek für die Bildersuche verwendest, führe diesen Befehl aus:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>playwright<span class="w"> </span>install
+</pre></div>
+</div>
+</section>
+</section>
+<section id="verwendung">
+<h2>Verwendung<a class="headerlink" href="#verwendung" title="Link to this heading"></a></h2>
+<p>Starte die Anwendung mit dem folgenden Befehl:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>streamlit<span class="w"> </span>run<span class="w"> </span>app.py
+</pre></div>
+</div>
+<p>Öffne Deinen Browser und navigiere zu <code class="docutils literal notranslate"><span class="pre">http://localhost:8501</span></code>.</p>
+</section>
+<section id="api-schlussel">
+<h2>API-Schlüssel<a class="headerlink" href="#api-schlussel" title="Link to this heading"></a></h2>
+<p>Stelle sicher, dass Dein Tavily API-Schlüssel als Umgebungsvariable gesetzt ist:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">TAVILY_API_KEY</span><span class="o">=</span><span class="s1">&#39;your_api_key_here&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="projektstruktur">
+<h2>Projektstruktur<a class="headerlink" href="#projektstruktur" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ParzivAI/
+│
+├── parzivai/main.py           # Hauptanwendung für Streamlit
+├── pyproject.toml             # Installationsdatei und Abhängigkeiten
+├── requirements-dev.txt       # Entwickler-Abhängigkeiten
+├── README.md                  # Übersicht
+├── example_notebooks/         # Verwendungsbeispiele
+├── docs/                      # Dokumentation
+</pre></div>
+</div>
+</section>
+<section id="lizenz">
+<h2>Lizenz<a class="headerlink" href="#lizenz" title="Link to this heading"></a></h2>
+<p>Dieses Projekt steht unter der MIT-Lizenz. Siehe die <code class="docutils literal notranslate"><span class="pre">LICENSE</span></code>-Datei für weitere Details.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="intro.html" class="btn btn-neutral float-left" title="ParzivAI: AI-based assistent for medieval history and middle high German" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="license_link.html" class="btn btn-neutral float-right" title="License" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Scientific Software Center, Heidelberg University.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
