@@ -108,7 +108,7 @@ try:
     nlp_mhg = spacy.load("../../Spacy-Model-for-Middle-High-German/models/model-best")
     nlp_mhg.add_pipe("sentencizer")
 except Exception as e:
-    st.error(f"Could not load Middle High German model: {e}")
+    st.warning(f"Could not load Middle High German model: {e}")
     nlp_mhg = None
 
 

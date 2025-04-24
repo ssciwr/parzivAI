@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 import asyncio
 from importlib import resources
 import torch
@@ -34,8 +35,12 @@ from parzivai.chat_models import (
 torch.classes.__path__ = []
 
 # Set API keys
+load_dotenv()  # TODO create a .env file in the root directory with TAVILY_API_KEY and delete initialization of TAVILY_API_KEY below
 if not os.getenv("TAVILY_API_KEY"):
     os.environ["TAVILY_API_KEY"] = "xxx"
+    st.warning(
+        "TAVILY_API_KEY not set in .env or environment. Search may not function properly."
+    )
 # Initialize web search tool
 web_search_tool = TavilySearchResults()
 # set data file path
@@ -44,36 +49,50 @@ FILE_PATH = PKG / "data"
 AVATAR_IMAGE = str(FILE_PATH / "parzival.png")
 retriever = get_vectorstore()
 llm = instantiate_llm()
+EMOJI_MAP = {
+    "Vectorstore": "📚",
+    "WebSearch": "🌐",
+    "Fallback": "🤖",
+    "useful": "✅",
+    "not useful": "❌",
+}
 
 
-def append_message_to_history(role, message):
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = pd.concat(
-            [
-                st.session_state.chat_history,
-                pd.DataFrame(
-                    {
-                        "Chat_Timestamp": [datetime.now()],
-                        "Chat_Role": [role],
-                        "Chat_Message": [message],
-                    }
-                ),
-            ],
-            ignore_index=True,
-        )
+def save_chat_to_history(role, message):
+    new_entry = pd.DataFrame(
+        {
+            "Chat_Timestamp": [datetime.now()],
+            "Chat_Role": [role],
+            "Chat_Message": [message],
+        }
+    )
+    st.session_state.chat_history = pd.concat(
+        [st.session_state.chat_history, new_entry], ignore_index=True
+    )
+
+
+def append_to_rendered_messages(role, content):
+    msg = (
+        HumanMessage(content=content) if role == "user" else AIMessage(content=content)
+    )
+    st.session_state.messages.append(msg)
 
 
 @st.cache_data(ttl=3600)
-def retrieve(question):
+def retrieve(question) -> dict:
     documents = retriever.invoke(question)
     return {"documents": documents, "question": question}
+
+
+def extract_content(doc_or_str):
+    """Safely extract content from Document or fallback to string."""
+    return getattr(doc_or_str, "page_content", doc_or_str)
 
 
 # Define grading function manually
 def grade_document(question: str, document: str) -> str:
     prompt = f"User question: {question}\n\nRetrieved document: {document}\n\nIs this document relevant to the user's question? Please answer 'yes' or 'no'."
-    print(f"Grading document with prompt: {prompt}")
-    response = llm.invoke(("human", prompt))
+    response = llm.invoke([HumanMessage(content=prompt)])
     print(f"LLM response: {response.content}")
     return (
         "yes"
@@ -83,14 +102,10 @@ def grade_document(question: str, document: str) -> str:
 
 
 def generate_answer(question, documents, messages):
-    context = "\n\n".join(
-        [doc.page_content if isinstance(doc, Document) else doc for doc in documents]
-    )
+    context = "\n\n".join(extract_content(doc) for doc in documents)
     prompt = f"User question: {question}\n\nContext from documents: {context}\n\nPlease provide a detailed and informative answer based on the context provided."
-    messages.append(("human", prompt))
-
+    messages.append(HumanMessage(content=prompt))
     generation = llm.invoke(messages)
-    messages[-1].content = generation.content
 
     return {
         "documents": documents,
@@ -102,17 +117,15 @@ def generate_answer(question, documents, messages):
 def llm_fallback_answer(question):
     messages = [HumanMessage(content=question), AIMessage(content="")]
     generation = llm.invoke(messages)
-    messages[-1].content = generation.content
-
     return {"question": question, "generation": generation.content}
 
 
 def grade_documents(question, documents):
-    filtered_docs = []
-    for d in documents:
-        document_content = d.page_content if isinstance(d, Document) else d
-        if grade_document(question, document_content) == "yes":
-            filtered_docs.append(d)
+    filtered_docs = [
+        d
+        for d in documents
+        if grade_document(question, extract_content(d)).lower() == "yes"
+    ]
     print(f"Filtered documents count: {len(filtered_docs)}")
     return {"documents": filtered_docs, "question": question}
 
@@ -159,148 +172,173 @@ def grade_generation_v_documents_and_question(question, generation):
     return "useful" if score == "yes" else "not useful"
 
 
-# TODO the below function and all related functions need to be
-# refactored
-# they are needlessly complex and entangled
-# the message passing from the LLM to the user does not work in streamlit,
-# only shows up in the terminal
-def process_user_input(user_input):
-    # st.session_state.messages.append(HumanMessage(content=user_input))
-    st.session_state.messages.append(("human", user_input))
-    with st.chat_message("user"):
-        st.markdown(user_input)
-    append_message_to_history("User", user_input)
+def initialize_session_state():
+    st.session_state.page = "main"
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    st.session_state.state = {
+        "question": "",
+        "documents": [],
+        "messages": [],
+        "route_taken": "",
+    }
+    st.session_state.cached_data = {"embeddings": [], "prompts": [], "web_results": []}
+    st.session_state.routing_data = []
+    st.session_state.feedback = []
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = pd.DataFrame(
+            {
+                "Chat_Timestamp": pd.Series(dtype="datetime64[ns]"),
+                "Chat_Role": pd.Series(dtype="str"),
+                "Chat_Message": pd.Series(dtype="str"),
+            }
+        )
+    if "feedback_data" not in st.session_state:
+        st.session_state.feedback_data = pd.DataFrame(
+            {
+                "Feedback_Timestamp": pd.Series(dtype="datetime64[ns]"),
+                "Feedback_Score": pd.Series(dtype="int"),
+                "Feedback_Comments": pd.Series(dtype="str"),
+            }
+        )
 
+
+def save_chat_history_and_messages(role: str, message: str):
+    append_to_rendered_messages(role, message)
+    save_chat_to_history(role, message)
+
+
+def process_user_input(user_input):
+    save_chat_history_and_messages("User", user_input)
     st.session_state.state["question"] = user_input
     st.session_state.state["messages"] = st.session_state.messages
 
-    if "übersetze" in user_input.lower():
-        with st.chat_message("assistant"):
-            st.markdown(
-                "🔄 Übersetzung angefordert - Antwort wird direkt durch ParzivAI generiert"
-            )
-        translation_response = llm.invoke(("human", user_input))
-        print(translation_response)
-        st.session_state.messages.append(
-            AIMessage(content=translation_response.content)
-        )
-        with st.chat_message("assistant", avatar=AVATAR_IMAGE):
-            st.markdown(translation_response.content)
-        append_message_to_history("Assistant", translation_response.content)
-    elif any(topic in user_input.lower() for topic in SENSITIVE_TOPICS):
-        with st.chat_message("assistant"):
-            st.markdown("⚠️ Trigger word detected - Providing emergency information.")
-        emergency_response = get_emergency_response()
-        st.session_state.messages.append(AIMessage(content=emergency_response))
-        with st.chat_message("assistant", avatar="⛔"):
-            st.markdown(emergency_response)
-        append_message_to_history("Assistant", emergency_response)
-    elif any(insult in user_input.lower() for insult in INSULTS):
-        with st.chat_message("assistant"):
-            st.markdown("🚫 Insult detected - Providing a response to insults.")
-        insult_response = get_insult_response()
-        st.session_state.messages.append(AIMessage(content=insult_response))
-        with st.chat_message("assistant", avatar="⚠️"):
-            st.markdown(insult_response)
-        append_message_to_history("Assistant", insult_response)
-    elif any(inquiry in user_input.lower() for inquiry in SIMPLE_INQUIRIES):
-        with st.chat_message("assistant"):
-            st.markdown("Direct response requested - Generating answer directly.")
-        direct_response = llm.invoke(("human", user_input))
-        st.session_state.messages.append(AIMessage(content=direct_response.content))
-        with st.chat_message("assistant", avatar=AVATAR_IMAGE):
-            st.markdown(direct_response.content)
-        append_message_to_history("Assistant", direct_response.content)
+    if is_translation_request(user_input):
+        handle_translation(user_input)
+    elif contains_any(user_input, SENSITIVE_TOPICS["sensitive_topics"]):
+        handle_emergency()
+    elif contains_any(user_input, INSULTS["insults"]):
+        handle_insult()
+    elif contains_any(user_input, SIMPLE_INQUIRIES["simple_inquiries"]):
+        handle_direct_response(user_input)
     else:
-        route_decision = decide_route(user_input)
-        st.session_state.state.update(route_decision)
+        handle_routing_and_answer(user_input)
 
-        if st.session_state.state["route_taken"] == "Vectorstore":
-            with st.chat_message("assistant"):
-                st.markdown(
-                    "📚 Relevant documents found in Vectorstore. Using these documents for answer generation."
-                )
-            st.session_state.state.update(
-                generate_answer(
-                    st.session_state.state["question"],
-                    st.session_state.state["documents"],
-                    st.session_state.state["messages"],
-                )
-            )
-        else:
-            with st.chat_message("assistant"):
-                st.markdown(
-                    "🌐 No relevant documents found in Vectorstore. Using web search results for answer generation."
-                )
-            st.session_state.state.update(
-                generate_answer(
-                    st.session_state.state["question"],
-                    st.session_state.state["documents"],
-                    st.session_state.state["messages"],
-                )
-            )
 
-        if st.session_state.state["documents"]:
-            document_texts = [
-                doc.page_content
-                for doc in st.session_state.state["documents"]
-                if isinstance(doc, Document)
-            ]
-            embd = load_embeddings_model()
-            document_embeddings = embd.embed_documents(document_texts)
-            st.session_state.cached_data["embeddings"].extend(document_embeddings)
-            st.session_state.cached_data["prompts"].append(user_input)
-        else:
-            st.session_state.cached_data["prompts"].append(user_input)
+def is_translation_request(text: str) -> bool:
+    return "übersetze" in text.lower()
 
-        emoji = {
-            "Vectorstore": "📚",
-            "WebSearch": "🌐",
-            "Fallback": "🤖",
-            "useful": "✅",
-            "not useful": "❌",
-        }.get(st.session_state.state["route_taken"], "🤖")
 
-        assistant_message = emoji + " " + st.session_state.state["generation"]
+def contains_any(text: str, keywords: list) -> bool:
+    return any(k.lower() in text.lower() for k in keywords)
 
-        if st.session_state.state["route_taken"] == "WebSearch":
-            if "web_results" in st.session_state:
-                web_results = st.session_state["web_results"]
-                assistant_message += f"\n\n**Web Search Results**:\n{web_results}"
 
-        route_message = f"Route taken: {st.session_state.state['route_taken']}"
-        assistant_message += f"\n\n{route_message}"
+def handle_translation(user_input: str):
+    save_chat_history_and_messages(
+        "Assistant",
+        "🔄 Übersetzung angefordert - Antwort wird direkt durch ParzivAI generiert",
+    )
+    response = llm.invoke([HumanMessage(content=user_input)])
+    save_chat_history_and_messages("Assistant", response.content)
 
-        st.session_state.messages.append(AIMessage(content=assistant_message))
-        with st.chat_message("assistant", avatar=AVATAR_IMAGE):
-            st.markdown(assistant_message)
-        append_message_to_history("Assistant", assistant_message)
 
-        if st.session_state.state["route_taken"] == "WebSearch":
-            st.session_state.cached_data["web_results"].append(
-                st.session_state.state["web_results"]
-            )
+def handle_emergency():
+    save_chat_history_and_messages(
+        "Assistant", "⚠️ Trigger word detected - Providing emergency information."
+    )
+    emergency_info = get_emergency_response()
+    save_chat_history_and_messages("Assistant", emergency_info)
 
-        routing_decision = {
+
+def handle_insult():
+    save_chat_history_and_messages(
+        "Assistant", "🚫 Insult detected - Providing a response to insults."
+    )
+    response = get_insult_response()
+    save_chat_history_and_messages("Assistant", response)
+
+
+def handle_direct_response(user_input: str):
+    save_chat_history_and_messages(
+        "Assistant", "💬 Direct response requested - Generating answer directly."
+    )
+    response = llm.invoke([HumanMessage(content=user_input)])
+    save_chat_history_and_messages("Assistant", response.content)
+
+
+def handle_routing_and_answer(user_input: str):
+    routing_info = decide_route(user_input)
+    st.session_state.state.update(routing_info)
+
+    if routing_info["route_taken"] == "Vectorstore":
+        save_chat_history_and_messages(
+            "Assistant",
+            "📚 Relevant documents found. Using them for answer generation.",
+        )
+    else:
+        save_chat_history_and_messages(
+            "Assistant", "🌐 No relevant documents found. Using web search results."
+        )
+
+    result = generate_answer(
+        st.session_state.state["question"],
+        st.session_state.state["documents"],
+        st.session_state.state["messages"],
+    )
+    st.session_state.state["generation"] = result
+
+    update_embedding_cache(user_input)
+
+    assistant_message = build_final_response_message(
+        routing_info["route_taken"], result
+    )
+    save_chat_history_and_messages("Assistant", assistant_message)
+
+    if "web_results" in routing_info:
+        st.session_state.cached_data["web_results"].append(routing_info["web_results"])
+
+    st.session_state.routing_data.append(
+        {
             "question": user_input,
-            "route_taken": st.session_state.state["route_taken"],
+            "route_taken": routing_info["route_taken"],
             "filtered_documents_count": len(st.session_state.state["documents"]),
         }
-        st.session_state.routing_data.append(routing_decision)
+    )
 
 
-# Function to update chat history
-def update_chat_history(role, message):
-    new_entry = pd.DataFrame(
-        {
-            "Chat_Timestamp": [datetime.now()],
-            "Chat_Role": [role],
-            "Chat_Message": [message],
-        }
-    )
-    st.session_state.chat_history = pd.concat(
-        [st.session_state.chat_history, new_entry], ignore_index=True
-    )
+def update_embedding_cache(user_input: str):
+    docs = st.session_state.state.get("documents", [])
+    texts = [extract_content(doc) for doc in docs]
+    if texts:
+        embeddings = load_embeddings_model().embed_documents(texts)
+        st.session_state.cached_data["embeddings"].extend(embeddings)
+    st.session_state.cached_data["prompts"].append(user_input)
+
+
+def build_final_response_message(route: str, result: dict) -> str:
+    emoji = EMOJI_MAP.get(route, "🤖")
+    message = f"{emoji} {result['generation']}"
+    if "web_results" in result:
+        message += f"\n\n**Web Search Results**:\n{result['web_results']}"
+    message += f"\n\nRoute taken: {route}"
+    return message
+
+
+def show_pos_tagging_options(latest_response: str):
+    st.markdown("### POS-Tagging Options")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("POS-Tagging (Modernes Deutsch)"):
+            doc = pos_tagging_modern(latest_response)
+            if doc:
+                st.session_state.linguistic_analysis = ("Modernes Deutsch", doc)
+                st.rerun()
+    with col2:
+        if st.button("POS-Tagging (Mittelhochdeutsch)"):
+            doc = pos_tagging_mhg(latest_response)
+            if doc:
+                st.session_state.linguistic_analysis = ("Mittelhochdeutsch", doc)
+                st.experimental_update()
 
 
 def main():
@@ -332,36 +370,12 @@ def main():
     )
     st.sidebar.title("Navigation")
     st.sidebar.image(AVATAR_IMAGE, width=150)
+    # function to initialize all session state variables
+    initialize_session_state()
+
     user_input = st.chat_input("Ask ParzivAI a question:")
     if user_input:
         process_user_input(user_input)
-
-    if "cached_data" not in st.session_state:
-        st.session_state.cached_data = {
-            "embeddings": [],
-            "prompts": [],
-            "web_results": [],
-        }
-
-    if "routing_data" not in st.session_state:
-        st.session_state.routing_data = []
-
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-
-    if "state" not in st.session_state:
-        st.session_state.state = {
-            "question": "",
-            "documents": [],
-            "messages": [],
-            "route_taken": "",
-        }
-
-    if "feedback" not in st.session_state:
-        st.session_state.feedback = []
-
-    if "page" not in st.session_state:
-        st.session_state.page = "main"
 
     with st.sidebar.expander("Cached Data"):
         st.write("Embeddings:")
@@ -382,39 +396,24 @@ def main():
 
     for message in st.session_state["messages"]:
         role = "user" if isinstance(message, HumanMessage) else "assistant"
-        content = message[1]
+        content = message.content
         avatar_icon = (
             AVATAR_IMAGE if role == "assistant" else None
         )  # Use a different variable name
         with st.chat_message(role, avatar=avatar_icon):
             st.markdown(content)
-        append_message_to_history(role, content)
 
     # Add POS-Tagging buttons dynamically after generating a response
-    if st.button("POS-Tagging (Modernes Deutsch)"):
-        assistant_response = st.session_state.messages[-1].content
-        doc = pos_tagging_modern(assistant_response)
-        if doc:
-            st.session_state.linguistic_analysis = ("Modernes Deutsch", doc)
-            st.experimental_update()  # Ensure the interface updates
-
-    if st.button("POS-Tagging (Mittelhochdeutsch)"):
-        assistant_response = st.session_state.messages[-1].content
-        doc = pos_tagging_mhg(assistant_response)
-        if doc:
-            st.session_state.linguistic_analysis = ("Mittelhochdeutsch", doc)
-            st.experimental_update()  # Ensure the interface updates
-
-    # Initialize session state variables
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = pd.DataFrame(
-            columns=["Chat_Timestamp", "Chat_Role", "Chat_Message"]
-        )
-
-    if "feedback_data" not in st.session_state:
-        st.session_state.feedback_data = pd.DataFrame(
-            columns=["Feedback_Timestamp", "Feedback_Score", "Feedback_Comments"]
-        )
+    assistant_response = next(
+        (
+            msg.content
+            for msg in reversed(st.session_state.messages)
+            if isinstance(msg, AIMessage)
+        ),
+        None,
+    )
+    if assistant_response:
+        show_pos_tagging_options(assistant_response)
 
     # Feedback collection
     feedback = streamlit_feedback(
@@ -436,9 +435,9 @@ def main():
         )
 
         # Combine chat history and feedback
-        combined_data = st.session_state.chat_history.copy()
-        combined_data = combined_data.append(
-            st.session_state.feedback_data, ignore_index=True
+        combined_data = pd.concat(
+            [st.session_state.chat_history, st.session_state.feedback_data],
+            ignore_index=True,
         )
 
         # Debugging step to print combined data
@@ -446,7 +445,10 @@ def main():
         st.write(combined_data)
 
         # Save to CSV
-        feedback_file = "pages/feedback_combined.csv"
+
+        feedback_file = FILE_PATH / "pages/feedback_combined.csv"
+        os.makedirs(feedback_file.parent, exist_ok=True)
+
         if os.path.exists(feedback_file):
             existing_data = pd.read_csv(feedback_file)
             combined_data = pd.concat([existing_data, combined_data], ignore_index=True)
@@ -465,10 +467,15 @@ def main():
 
     with tab2:
         st.header("Bildersuche")
-        topic = st.text_input("Enter a topic for image search:")
-        if st.button("Search"):
-            st.session_state.image_search_result = topic
-            st.experimental_update()
+        with st.form("image_search_form"):
+            topic = st.text_input("Enter a topic for image search:")
+            search_submitted = st.form_submit_button("Search")
+
+        if search_submitted:
+            if topic.strip():
+                st.session_state.image_search_result = topic.strip()
+            else:
+                st.warning("Please enter a topic to search for images.")
 
         if "image_search_result" in st.session_state:
             st.write("Searching for images...")

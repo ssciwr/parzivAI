@@ -87,5 +87,5 @@ async def display_images(topic: str):
         st.image(
             data["url"],
             caption=f"Bildthema: {data['name']}, Archivnummer: {data['archiveNumber']}, URL: {data['url']}",
-            use_column_width=True,
+            use_container_width=True,
         )
