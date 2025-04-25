@@ -14,10 +14,12 @@ from langchain_core.messages import HumanMessage, AIMessage
 
 st.set_page_config(page_title="ParzivAI")
 from parzivai.input_output import get_vectorstore, load_embeddings_model
-from parzivai.image_search import display_images
+from parzivai.image_search import fetch_images_for_topic
 from parzivai.text_tagging import (
     check_attributes,
     POS_DESCRIPTIONS,
+    load_modern_model,
+    load_mhg_model,
     pos_tagging_mhg,
     pos_tagging_modern,
 )
@@ -34,6 +36,19 @@ from parzivai.chat_models import (
 # see https://github.com/SaiAkhil066/DeepSeek-RAG-Chatbot/issues/4
 torch.classes.__path__ = []
 
+
+# Add cache approach of getting models here, to make it easier for unit-tests
+@st.cache_resource
+def get_cached_retriever():
+    embedding_model = load_embeddings_model()
+    return get_vectorstore(embedding_model)
+
+
+@st.cache_resource
+def get_models():
+    return load_modern_model(), load_mhg_model()
+
+
 # Set API keys
 load_dotenv()  # TODO create a .env file in the root directory with TAVILY_API_KEY and delete initialization of TAVILY_API_KEY below
 if not os.getenv("TAVILY_API_KEY"):
@@ -47,7 +62,6 @@ web_search_tool = TavilySearchResults()
 PKG = resources.files("parzivai")
 FILE_PATH = PKG / "data"
 AVATAR_IMAGE = str(FILE_PATH / "parzival.png")
-retriever = get_vectorstore()
 llm = instantiate_llm()
 EMOJI_MAP = {
     "Vectorstore": "📚",
@@ -79,7 +93,7 @@ def append_to_rendered_messages(role, content):
 
 
 @st.cache_data(ttl=3600)
-def retrieve(question) -> dict:
+def retrieve(question, retriever) -> dict:
     documents = retriever.invoke(question)
     return {"documents": documents, "question": question}
 
@@ -150,8 +164,8 @@ def web_search(question):
     }
 
 
-def decide_route(question):
-    documents = retrieve(question)["documents"]
+def decide_route(question, retriever):
+    documents = retrieve(question, retriever)["documents"]
     print("Documents retrieved from Vectorstore:")
     for doc in documents:
         print(doc if isinstance(doc, str) else doc.page_content)
@@ -208,7 +222,7 @@ def save_chat_history_and_messages(role: str, message: str):
     save_chat_to_history(role, message)
 
 
-def process_user_input(user_input):
+def process_user_input(user_input, retriever):
     save_chat_history_and_messages("User", user_input)
     st.session_state.state["question"] = user_input
     st.session_state.state["messages"] = st.session_state.messages
@@ -222,7 +236,7 @@ def process_user_input(user_input):
     elif contains_any(user_input, SIMPLE_INQUIRIES["simple_inquiries"]):
         handle_direct_response(user_input)
     else:
-        handle_routing_and_answer(user_input)
+        handle_routing_and_answer(user_input, retriever)
 
 
 def is_translation_request(text: str) -> bool:
@@ -266,8 +280,8 @@ def handle_direct_response(user_input: str):
     save_chat_history_and_messages("Assistant", response.content)
 
 
-def handle_routing_and_answer(user_input: str):
-    routing_info = decide_route(user_input)
+def handle_routing_and_answer(user_input: str, retriever):
+    routing_info = decide_route(user_input, retriever)
     st.session_state.state.update(routing_info)
 
     if routing_info["route_taken"] == "Vectorstore":
@@ -324,18 +338,18 @@ def build_final_response_message(route: str, result: dict) -> str:
     return message
 
 
-def show_pos_tagging_options(latest_response: str):
+def show_pos_tagging_options(latest_response: str, nlp_modern, nlp_mhg):
     st.markdown("### POS-Tagging Options")
     col1, col2 = st.columns(2)
     with col1:
         if st.button("POS-Tagging (Modernes Deutsch)"):
-            doc = pos_tagging_modern(latest_response)
+            doc = pos_tagging_modern(nlp_modern, latest_response)
             if doc:
                 st.session_state.linguistic_analysis = ("Modernes Deutsch", doc)
                 st.rerun()
     with col2:
         if st.button("POS-Tagging (Mittelhochdeutsch)"):
-            doc = pos_tagging_mhg(latest_response)
+            doc = pos_tagging_mhg(nlp_mhg, latest_response)
             if doc:
                 st.session_state.linguistic_analysis = ("Mittelhochdeutsch", doc)
                 st.experimental_update()
@@ -372,10 +386,12 @@ def main():
     st.sidebar.image(AVATAR_IMAGE, width=150)
     # function to initialize all session state variables
     initialize_session_state()
+    retriever = get_cached_retriever()
+    nlp_modern, nlp_mhg = get_models()
 
     user_input = st.chat_input("Ask ParzivAI a question:")
     if user_input:
-        process_user_input(user_input)
+        process_user_input(user_input, retriever)
 
     with st.sidebar.expander("Cached Data"):
         st.write("Embeddings:")
@@ -413,7 +429,7 @@ def main():
         None,
     )
     if assistant_response:
-        show_pos_tagging_options(assistant_response)
+        show_pos_tagging_options(assistant_response, nlp_modern, nlp_mhg)
 
     # Feedback collection
     feedback = streamlit_feedback(
@@ -479,7 +495,16 @@ def main():
 
         if "image_search_result" in st.session_state:
             st.write("Searching for images...")
-            asyncio.run(display_images(st.session_state.image_search_result))
+            image_data = asyncio.run(
+                fetch_images_for_topic(st.session_state.image_search_result)
+            )
+
+            for data in image_data:
+                st.image(
+                    data["url"],
+                    caption=f"Bildthema: {data['name']}, Archivnummer: {data['archiveNumber']}, URL: {data['url']}",
+                    use_container_width=True,
+                )
 
     with tab3:
         st.header("Linguistische Analyse")

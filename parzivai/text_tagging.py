@@ -98,34 +98,37 @@ TAG_TO_POS = {
 }
 
 
-try:
-    nlp_modern = spacy.load("de_core_news_sm")
-except Exception as e:
-    st.error(f"Could not load modern German model: {e}")
-    nlp_modern = None
-
-try:
-    nlp_mhg = spacy.load("../../Spacy-Model-for-Middle-High-German/models/model-best")
-    nlp_mhg.add_pipe("sentencizer")
-except Exception as e:
-    st.warning(f"Could not load Middle High German model: {e}")
-    nlp_mhg = None
+def load_modern_model():
+    try:
+        return spacy.load("de_core_news_sm")
+    except Exception as e:
+        raise RuntimeError(f"Could not load modern German model: {e}")
 
 
-def pos_tagging_modern(text):
+def load_mhg_model():
+    try:
+        nlp_mhg = spacy.load(
+            "../../Spacy-Model-for-Middle-High-German/models/model-best"
+        )
+        nlp_mhg.add_pipe("sentencizer")
+        return nlp_mhg
+    except Exception as e:
+        raise RuntimeError(f"Could not load Middle High German model: {e}")
+
+
+def pos_tagging_modern(nlp_modern, text):
     doc = nlp_modern(text)
     return doc
 
 
-def pos_tagging_mhg(text):
-    if nlp_mhg:
-        doc = nlp_mhg(text)
-        for token in doc:
-            token.pos_ = TAG_TO_POS.get(token.tag_, "X")
-        return doc
-    else:
-        st.error("Middle High German model is not available.")
-        return None
+def pos_tagging_mhg(nlp_mhg, text):
+    if not nlp_mhg:
+        raise RuntimeError("Middle High German model is not available.")
+
+    doc = nlp_mhg(text)
+    for token in doc:
+        token.pos_ = TAG_TO_POS.get(token.tag_, "X")
+    return doc
 
 
 def check_attributes(doc):
