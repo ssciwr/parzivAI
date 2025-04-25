@@ -10,6 +10,7 @@ nbval
 pre-commit
 pytest
 pytest-cov
+python-dotenv
 sphinx
 sphinx_mdinclude
 sphinx_rtd_theme
