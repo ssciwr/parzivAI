@@ -48,17 +48,30 @@
 <li class="toctree-l1"><a class="reference internal" href="intro_German.html">ParzivAI: KI-basierter Assistent für Mittelalterliche Geschichte und Mittelhochdeutsche Sprache</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license_link.html">License</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">streamlit app module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#app.append_message_to_history"><code class="docutils literal notranslate"><span class="pre">append_message_to_history()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.append_to_rendered_messages"><code class="docutils literal notranslate"><span class="pre">append_to_rendered_messages()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.build_final_response_message"><code class="docutils literal notranslate"><span class="pre">build_final_response_message()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.contains_any"><code class="docutils literal notranslate"><span class="pre">contains_any()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.decide_route"><code class="docutils literal notranslate"><span class="pre">decide_route()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.extract_content"><code class="docutils literal notranslate"><span class="pre">extract_content()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.generate_answer"><code class="docutils literal notranslate"><span class="pre">generate_answer()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.grade_document"><code class="docutils literal notranslate"><span class="pre">grade_document()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.grade_documents"><code class="docutils literal notranslate"><span class="pre">grade_documents()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.grade_generation_v_documents_and_question"><code class="docutils literal notranslate"><span class="pre">grade_generation_v_documents_and_question()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.handle_direct_response"><code class="docutils literal notranslate"><span class="pre">handle_direct_response()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.handle_emergency"><code class="docutils literal notranslate"><span class="pre">handle_emergency()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.handle_insult"><code class="docutils literal notranslate"><span class="pre">handle_insult()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.handle_routing_and_answer"><code class="docutils literal notranslate"><span class="pre">handle_routing_and_answer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.handle_translation"><code class="docutils literal notranslate"><span class="pre">handle_translation()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.initialize_session_state"><code class="docutils literal notranslate"><span class="pre">initialize_session_state()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.is_translation_request"><code class="docutils literal notranslate"><span class="pre">is_translation_request()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.llm_fallback_answer"><code class="docutils literal notranslate"><span class="pre">llm_fallback_answer()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.process_user_input"><code class="docutils literal notranslate"><span class="pre">process_user_input()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.retrieve"><code class="docutils literal notranslate"><span class="pre">retrieve()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#app.update_chat_history"><code class="docutils literal notranslate"><span class="pre">update_chat_history()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.save_chat_history_and_messages"><code class="docutils literal notranslate"><span class="pre">save_chat_history_and_messages()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.save_chat_to_history"><code class="docutils literal notranslate"><span class="pre">save_chat_to_history()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.show_pos_tagging_options"><code class="docutils literal notranslate"><span class="pre">show_pos_tagging_options()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.update_embedding_cache"><code class="docutils literal notranslate"><span class="pre">update_embedding_cache()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.web_search"><code class="docutils literal notranslate"><span class="pre">web_search()</span></code></a></li>
 </ul>
 </li>
@@ -149,14 +162,30 @@
   <section id="module-app">
 <span id="streamlit-app-module"></span><h1>streamlit app module<a class="headerlink" href="#module-app" title="Link to this heading"></a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="app.append_message_to_history">
-<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">append_message_to_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">role</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.append_message_to_history" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="app.append_to_rendered_messages">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">append_to_rendered_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">role</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.append_to_rendered_messages" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.build_final_response_message">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">build_final_response_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">route</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#app.build_final_response_message" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.contains_any">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">contains_any</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keywords</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#app.contains_any" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.decide_route">
 <span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">decide_route</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.decide_route" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.extract_content">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">extract_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc_or_str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.extract_content" title="Link to this definition"></a></dt>
+<dd><p>Safely extract content from Document or fallback to string.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.generate_answer">
@@ -179,6 +208,41 @@
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="app.handle_direct_response">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">handle_direct_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.handle_direct_response" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.handle_emergency">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">handle_emergency</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.handle_emergency" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.handle_insult">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">handle_insult</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.handle_insult" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.handle_routing_and_answer">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">handle_routing_and_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.handle_routing_and_answer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.handle_translation">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">handle_translation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.handle_translation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.initialize_session_state">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">initialize_session_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.initialize_session_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.is_translation_request">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">is_translation_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#app.is_translation_request" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="app.llm_fallback_answer">
 <span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">llm_fallback_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.llm_fallback_answer" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -195,12 +259,27 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.retrieve">
-<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">retrieve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.retrieve" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">retrieve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#app.retrieve" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="app.update_chat_history">
-<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">update_chat_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">role</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.update_chat_history" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="app.save_chat_history_and_messages">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">save_chat_history_and_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">role</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.save_chat_history_and_messages" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.save_chat_to_history">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">save_chat_to_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">role</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.save_chat_to_history" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.show_pos_tagging_options">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">show_pos_tagging_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latest_response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.show_pos_tagging_options" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.update_embedding_cache">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">update_embedding_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.update_embedding_cache" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
