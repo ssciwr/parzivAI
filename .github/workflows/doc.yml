@@ -19,9 +19,6 @@ jobs:
       run: |
         pip install -e .
         python -m pip install -r requirements-dev.txt
-    - name: get pandoc
-      run: |
-        sudo apt-get install -y pandoc
     - name: Build documentation
       run: |
         cd docs

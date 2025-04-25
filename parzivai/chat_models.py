@@ -82,8 +82,10 @@ class GraphState(BaseModel):
 def instantiate_llm(model: str = MODEL) -> ChatOllama:
     """
     Instantiate the LLM with the specified model and parameters.
+
     Args:
         model (str): The model to use for the LLM.
+
     Returns:
         ChatOllama: The instantiated LLM.
     """
