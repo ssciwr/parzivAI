@@ -353,7 +353,7 @@ def show_pos_tagging_options(latest_response: str, nlp_modern, nlp_mhg):
             doc = pos_tagging_mhg(nlp_mhg, latest_response)
             if doc:
                 st.session_state.linguistic_analysis = ("Mittelhochdeutsch", doc)
-                st.experimental_update()
+                st.rerun()
 
 
 def main():

@@ -1,8 +1,12 @@
+import os
 import spacy
 from importlib import resources
 
-PKG = resources.files("parzivai")
-mhg_model_path = PKG.parents[1]
+if not os.getenv("SPACY_MHG_MODEL_PATH"):
+    PKG = resources.files("parzivai")
+    mhg_model_path = PKG.parents[1]
+else:
+    mhg_model_path = os.getenv("SPACY_MHG_MODEL_PATH")
 
 
 POS_DESCRIPTIONS = {
