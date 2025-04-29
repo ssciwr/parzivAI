@@ -105,7 +105,11 @@ def load_modern_model():
     try:
         return spacy.load("de_core_news_sm")
     except Exception as e:
-        raise RuntimeError(f"Could not load modern German model: {e}")
+        try:
+            spacy.cli.download("de_core_news_sm")
+            return spacy.load("de_core_news_sm")
+        except Exception as e:
+            raise RuntimeError(f"Could not load or download modern German model: {e}")
 
 
 def load_mhg_model():
