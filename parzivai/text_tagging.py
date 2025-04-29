@@ -1,12 +1,7 @@
 import os
+from pathlib import Path
 import spacy
 from importlib import resources
-
-if not os.getenv("SPACY_MHG_MODEL_PATH"):
-    PKG = resources.files("parzivai")
-    mhg_model_path = PKG.parents[1]
-else:
-    mhg_model_path = os.getenv("SPACY_MHG_MODEL_PATH")
 
 
 POS_DESCRIPTIONS = {
@@ -117,6 +112,12 @@ def load_modern_model():
 
 
 def load_mhg_model():
+    if not os.getenv("SPACY_MHG_MODEL_PATH"):
+        PKG = resources.files("parzivai")
+        mhg_model_path = PKG.parents[1]
+    else:
+        mhg_model_path = os.getenv("SPACY_MHG_MODEL_PATH")
+        mhg_model_path = Path(mhg_model_path)
     try:
         nlp_mhg = spacy.load(
             mhg_model_path
