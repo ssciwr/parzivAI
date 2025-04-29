@@ -1,4 +1,8 @@
 import spacy
+from importlib import resources
+
+PKG = resources.files("parzivai")
+mhg_model_path = PKG.parents[1]
 
 
 POS_DESCRIPTIONS = {
@@ -107,7 +111,10 @@ def load_modern_model():
 def load_mhg_model():
     try:
         nlp_mhg = spacy.load(
-            "../../Spacy-Model-for-Middle-High-German/models/model-best"
+            mhg_model_path
+            / "Spacy-Model-for-Middle-High-German"
+            / "models"
+            / "model-best"
         )
         nlp_mhg.add_pipe("sentencizer")
         return nlp_mhg
