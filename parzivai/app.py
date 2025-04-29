@@ -30,6 +30,9 @@ from parzivai.chat_models import (
     SIMPLE_INQUIRIES,
 )
 
+# Page configuration (must be first Streamlit command)
+st.set_page_config(page_title="ParzivAI")
+
 # avoid some torch incompatibility issues with newer Python versions
 # see https://github.com/SaiAkhil066/DeepSeek-RAG-Chatbot/issues/4
 torch.classes.__path__ = []
@@ -355,9 +358,6 @@ def show_pos_tagging_options(latest_response: str, nlp_modern, nlp_mhg):
 
 def main():
     # Main function to run the Streamlit app
-    # Page configuration (must be first Streamlit command)
-    st.set_page_config(page_title="ParzivAI")
-
     tab1, tab2, tab3, tab4 = st.tabs(
         [
             "ParzivAI Chatbot",
