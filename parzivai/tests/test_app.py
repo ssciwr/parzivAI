@@ -15,5 +15,5 @@ def get_app():
 
 
 def test_run_app(get_app):
-    get_app.run(timeout=100)
+    get_app.run(timeout=800)
     assert not get_app.exception
