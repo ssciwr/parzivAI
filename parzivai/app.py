@@ -11,8 +11,6 @@ import spacy_streamlit
 from langchain.schema import Document
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.messages import HumanMessage, AIMessage
-
-st.set_page_config(page_title="ParzivAI")
 from parzivai.input_output import get_vectorstore, load_embeddings_model
 from parzivai.image_search import fetch_images_for_topic
 from parzivai.text_tagging import (
@@ -358,6 +356,8 @@ def show_pos_tagging_options(latest_response: str, nlp_modern, nlp_mhg):
 def main():
     # Main function to run the Streamlit app
     # Page configuration (must be first Streamlit command)
+    st.set_page_config(page_title="ParzivAI")
+
     tab1, tab2, tab3, tab4 = st.tabs(
         [
             "ParzivAI Chatbot",
