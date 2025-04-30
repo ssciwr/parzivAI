@@ -121,11 +121,15 @@
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>spacy<span class="w"> </span>download<span class="w"> </span>de_core_news_sm
 </pre></div>
 </div>
-<p>(<em>TODO: Download models on the fly if not found through the spacy cli</em>)</p>
-<p>For Middle High German, a specially trained model must be loaded, and its path needs to be integrated into the code. The model can be found <a class="reference external" href="https://github.com/Middle-High-German-Conceptual-Database/Spacy-Model-for-Middle-High-German">here</a>. Git clone the repository and place it in the same folder as the parzivAI repo:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>you-folder/
+<p>Note that the model is downloaded on the fly if not found through the spacy cli.</p>
+<p>For Middle High German, a specially trained model must be loaded, and its path needs to be integrated into the code. The model can be found <a class="reference external" href="https://github.com/Middle-High-German-Conceptual-Database/Spacy-Model-for-Middle-High-German">here</a>. Git clone the repository and either set an environment variable with the model path as</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">SPACY_MHG_MODEL_PATH</span><span class="o">=/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">Spacy</span><span class="o">-</span><span class="n">Model</span><span class="o">-</span><span class="k">for</span><span class="o">-</span><span class="n">Middle</span><span class="o">-</span><span class="n">High</span><span class="o">-</span><span class="n">German</span><span class="o">-</span><span class="n">repo</span>
+</pre></div>
+</div>
+<p>or place it in the same folder as the parzivAI repo:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>your-folder/
 │
-├── parzivai                                 # parzivai
+├── parzivai                                 # parzivai repo
 ├── Spacy-Model-for-Middle-High-German       # spaCy model
 </pre></div>
 </div>

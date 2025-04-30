@@ -54,6 +54,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#app.decide_route"><code class="docutils literal notranslate"><span class="pre">decide_route()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.extract_content"><code class="docutils literal notranslate"><span class="pre">extract_content()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.generate_answer"><code class="docutils literal notranslate"><span class="pre">generate_answer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.get_cached_retriever"><code class="docutils literal notranslate"><span class="pre">get_cached_retriever()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#app.get_models"><code class="docutils literal notranslate"><span class="pre">get_models()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.grade_document"><code class="docutils literal notranslate"><span class="pre">grade_document()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.grade_documents"><code class="docutils literal notranslate"><span class="pre">grade_documents()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#app.grade_generation_v_documents_and_question"><code class="docutils literal notranslate"><span class="pre">grade_generation_v_documents_and_question()</span></code></a></li>
@@ -116,8 +118,8 @@
 <li class="toctree-l1"><a class="reference internal" href="#module-image_search">image search module</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#image_search.adjust_image_url"><code class="docutils literal notranslate"><span class="pre">adjust_image_url()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#image_search.construct_image_search_url"><code class="docutils literal notranslate"><span class="pre">construct_image_search_url()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#image_search.display_images"><code class="docutils literal notranslate"><span class="pre">display_images()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#image_search.fetch_images"><code class="docutils literal notranslate"><span class="pre">fetch_images()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#image_search.fetch_images_for_topic"><code class="docutils literal notranslate"><span class="pre">fetch_images_for_topic()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#module-input_output">IO handling module</a><ul>
@@ -129,6 +131,8 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#module-text_tagging">annotations module</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#text_tagging.check_attributes"><code class="docutils literal notranslate"><span class="pre">check_attributes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#text_tagging.load_mhg_model"><code class="docutils literal notranslate"><span class="pre">load_mhg_model()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#text_tagging.load_modern_model"><code class="docutils literal notranslate"><span class="pre">load_modern_model()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#text_tagging.pos_tagging_mhg"><code class="docutils literal notranslate"><span class="pre">pos_tagging_mhg()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#text_tagging.pos_tagging_modern"><code class="docutils literal notranslate"><span class="pre">pos_tagging_modern()</span></code></a></li>
 </ul>
@@ -178,7 +182,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.decide_route">
-<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">decide_route</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.decide_route" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">decide_route</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retriever</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.decide_route" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -190,6 +194,16 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="app.generate_answer">
 <span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">generate_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">documents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">messages</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.generate_answer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.get_cached_retriever">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">get_cached_retriever</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.get_cached_retriever" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.get_models">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">get_models</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.get_models" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -224,7 +238,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.handle_routing_and_answer">
-<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">handle_routing_and_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.handle_routing_and_answer" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">handle_routing_and_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retriever</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.handle_routing_and_answer" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -254,12 +268,12 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.process_user_input">
-<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">process_user_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.process_user_input" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">process_user_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retriever</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.process_user_input" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.retrieve">
-<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">retrieve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#app.retrieve" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">retrieve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retriever</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#app.retrieve" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -274,7 +288,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="app.show_pos_tagging_options">
-<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">show_pos_tagging_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latest_response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.show_pos_tagging_options" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">show_pos_tagging_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latest_response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlp_modern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlp_mhg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.show_pos_tagging_options" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -442,15 +456,15 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="image_search.display_images">
-<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">image_search.</span></span><span class="sig-name descname"><span class="pre">display_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#image_search.display_images" title="Link to this definition"></a></dt>
-<dd><p>Display fetched images in Streamlit.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="image_search.fetch_images">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">image_search.</span></span><span class="sig-name descname"><span class="pre">fetch_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#image_search.fetch_images" title="Link to this definition"></a></dt>
 <dd><p>Fetch images related to a topic from the hardcoded site.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="image_search.fetch_images_for_topic">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">image_search.</span></span><span class="sig-name descname"><span class="pre">fetch_images_for_topic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#image_search.fetch_images_for_topic" title="Link to this definition"></a></dt>
+<dd><p>Return image metadata for a given topic.</p>
 </dd></dl>
 
 </section>
@@ -458,7 +472,7 @@
 <span id="io-handling-module"></span><h1>IO handling module<a class="headerlink" href="#module-input_output" title="Link to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="input_output.get_vectorstore">
-<span class="sig-prename descclassname"><span class="pre">input_output.</span></span><span class="sig-name descname"><span class="pre">get_vectorstore</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#input_output.get_vectorstore" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">input_output.</span></span><span class="sig-name descname"><span class="pre">get_vectorstore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding_model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#input_output.get_vectorstore" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -468,7 +482,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="input_output.load_documents_and_create_vectorstore">
-<span class="sig-prename descclassname"><span class="pre">input_output.</span></span><span class="sig-name descname"><span class="pre">load_documents_and_create_vectorstore</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#input_output.load_documents_and_create_vectorstore" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">input_output.</span></span><span class="sig-name descname"><span class="pre">load_documents_and_create_vectorstore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding_model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#input_output.load_documents_and_create_vectorstore" title="Link to this definition"></a></dt>
 <dd><p>Load documents from URLs and static files to create FAISS vector store.</p>
 </dd></dl>
 
@@ -486,13 +500,23 @@
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="text_tagging.load_mhg_model">
+<span class="sig-prename descclassname"><span class="pre">text_tagging.</span></span><span class="sig-name descname"><span class="pre">load_mhg_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#text_tagging.load_mhg_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="text_tagging.load_modern_model">
+<span class="sig-prename descclassname"><span class="pre">text_tagging.</span></span><span class="sig-name descname"><span class="pre">load_modern_model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#text_tagging.load_modern_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="text_tagging.pos_tagging_mhg">
-<span class="sig-prename descclassname"><span class="pre">text_tagging.</span></span><span class="sig-name descname"><span class="pre">pos_tagging_mhg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#text_tagging.pos_tagging_mhg" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">text_tagging.</span></span><span class="sig-name descname"><span class="pre">pos_tagging_mhg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nlp_mhg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#text_tagging.pos_tagging_mhg" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="text_tagging.pos_tagging_modern">
-<span class="sig-prename descclassname"><span class="pre">text_tagging.</span></span><span class="sig-name descname"><span class="pre">pos_tagging_modern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#text_tagging.pos_tagging_modern" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">text_tagging.</span></span><span class="sig-name descname"><span class="pre">pos_tagging_modern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nlp_modern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#text_tagging.pos_tagging_modern" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
