@@ -1,7 +1,7 @@
 import os
 import json
+import warnings
 from importlib import resources
-import streamlit as st
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import (
@@ -27,14 +27,11 @@ def load_config(file):
         with open(FILE_PATH / file, "r") as file:
             return json.load(file)
     except FileNotFoundError:
-        st.error(f"Configuration file not found: {FILE_PATH / file}")
-        return {}
+        raise RuntimeError(f"Configuration file not found: {FILE_PATH / file}")
     except json.JSONDecodeError as e:
-        st.error(f"Error decoding configuration file: {e}")
-        return {}
+        raise RuntimeError(f"Error decoding configuration file: {e}")
 
 
-@st.cache_resource
 def load_embeddings_model():
     model_name_hf = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
     model_kwargs_hf = {"device": "cpu"}
@@ -46,7 +43,7 @@ def load_embeddings_model():
     )
 
 
-def load_documents_and_create_vectorstore():
+def load_documents_and_create_vectorstore(embedding_model):
     """Load documents from URLs and static files to create FAISS vector store."""
     # Load URLs
     urls_data = load_config(file="urls.json")
@@ -74,8 +71,9 @@ def load_documents_and_create_vectorstore():
             else:
                 continue
             static_docs.extend(loader.load())
-        except Exception as e:
-            print(f"Error loading file {file_name}: {e}")
+        except (IOError, ValueError) as e:
+            warnings.warn(f"Problem loading '{file_name}': {e}", UserWarning)
+            continue
 
     # Combine and process documents
     all_docs = web_docs + static_docs
@@ -86,28 +84,26 @@ def load_documents_and_create_vectorstore():
     print("Documents loaded and split successfully.")
 
     # Create and save FAISS vector store
-    vectorstore = FAISS.from_documents(doc_splits, load_embeddings_model())
+    vectorstore = FAISS.from_documents(doc_splits, embedding_model)
     vectorstore.save_local(persist_folder)
     print(f"FAISS index initialized and saved successfully in {persist_folder}.")
     return vectorstore
 
 
-def get_vectorstore():
+def get_vectorstore(embedding_model):
     vectorstore_exists = os.path.exists(index_path)
     if vectorstore_exists:
         try:
             vectorstore = FAISS.load_local(
                 persist_folder,
-                load_embeddings_model(),
+                embedding_model,
                 allow_dangerous_deserialization=True,
             )
             print(f"FAISS index loaded successfully from {persist_folder}.")
         except Exception as e:
-            print(f"Error loading existing FAISS index: {e}")
-            st.error(f"Error loading existing FAISS index: {e}")
-            raise e
+            raise RuntimeError(f"Error loading existing FAISS index: {e}") from e
     else:
-        vectorstore = load_documents_and_create_vectorstore()
+        vectorstore = load_documents_and_create_vectorstore(embedding_model)
 
     retriever = vectorstore.as_retriever()
     return retriever

@@ -27,13 +27,17 @@ parzivAI makes use from [spaCy](https://spacy.io/) under the hood. Download the 
 ```bash
 python -m spacy download de_core_news_sm
 ```
-(*TODO: Download models on the fly if not found through the spacy cli*)
+Note that the model is downloaded on the fly if not found through the spacy cli.
 
-For Middle High German, a specially trained model must be loaded, and its path needs to be integrated into the code. The model can be found [here](https://github.com/Middle-High-German-Conceptual-Database/Spacy-Model-for-Middle-High-German). Git clone the repository and place it in the same folder as the parzivAI repo:
+For Middle High German, a specially trained model must be loaded, and its path needs to be integrated into the code. The model can be found [here](https://github.com/Middle-High-German-Conceptual-Database/Spacy-Model-for-Middle-High-German). Git clone the repository and either set an environment variable with the model path as
 ```
-you-folder/
+export SPACY_MHG_MODEL_PATH=/path/to/Spacy-Model-for-Middle-High-German-repo
+```
+or place it in the same folder as the parzivAI repo:
+```
+your-folder/
 │
-├── parzivai                                 # parzivai
+├── parzivai                                 # parzivai repo
 ├── Spacy-Model-for-Middle-High-German       # spaCy model
 ```
 (*TODO: Make sure this is platform-agnostic and can also be done on-the-fly*)

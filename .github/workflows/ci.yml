@@ -26,7 +26,13 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
+      with:
+        path: .
+    - name: Checkout the mhg spacy model repo
+      uses: actions/checkout@v4
+      with:
+        repository: Middle-High-German-Conceptual-Database/Spacy-Model-for-Middle-High-German
+        path: mhg
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v5
       with:
@@ -37,6 +43,8 @@ jobs:
         python -m pip install -r requirements-dev.txt
         cd parzivai
         python -m pytest -svv --cov=. --cov-branch --cov-report=xml
+      env:
+        SPACY_MHG_MODEL_PATH: ${{ github.workspace }}/mhg
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
       with:

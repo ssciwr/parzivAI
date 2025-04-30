@@ -1,4 +1,3 @@
-import streamlit as st
 from urllib.parse import quote
 import json
 from playwright.async_api import async_playwright
@@ -16,11 +15,12 @@ try:
             "image_search_url"
         )  # it would be defined in the config file
 except FileNotFoundError:
-    st.error(f"Configuration file not found at {CONFIG_PATH}. Please ensure it exists.")
-    raise
+    raise RuntimeError(
+        f"Configuration file not found at {CONFIG_PATH}. Please ensure it exists."
+    )
+
 except json.JSONDecodeError as e:
-    st.error(f"Error decoding configuration file: {e}")
-    raise
+    raise RuntimeError(f"Error decoding configuration file: {e}") from e
 
 
 def adjust_image_url(url: str) -> str:
@@ -80,12 +80,6 @@ async def fetch_images(topic: str):
         return image_data
 
 
-async def display_images(topic: str):
-    """Display fetched images in Streamlit."""
-    image_data = await fetch_images(topic)
-    for data in image_data:
-        st.image(
-            data["url"],
-            caption=f"Bildthema: {data['name']}, Archivnummer: {data['archiveNumber']}, URL: {data['url']}",
-            use_container_width=True,
-        )
+async def fetch_images_for_topic(topic: str) -> list[dict]:
+    """Return image metadata for a given topic."""
+    return await fetch_images(topic)
