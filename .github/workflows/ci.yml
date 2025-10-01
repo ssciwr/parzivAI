@@ -34,7 +34,7 @@ jobs:
         repository: Middle-High-German-Conceptual-Database/Spacy-Model-for-Middle-High-German
         path: mhg
     - name: Set up Python ${{ matrix.python }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python }}
     - name: Install Python package and run tests
