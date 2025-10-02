@@ -27,6 +27,7 @@ dependencies = [
     "langchain-community<=0.3.24",
     "langchain-huggingface",
     "langchain-ollama",
+    "llama-cpp-python<=0.2.55",
     "sentence-transformers",
     "torch",
     "pydantic",
