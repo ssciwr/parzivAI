@@ -39,6 +39,7 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Install Python package and run tests
       run: |
+        pip install spacy --no-binary blis
         python -m pip install -e .
         python -m pip install -r requirements-dev.txt
         cd parzivai
