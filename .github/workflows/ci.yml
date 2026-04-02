@@ -46,7 +46,7 @@ jobs:
       env:
         SPACY_MHG_MODEL_PATH: ${{ github.workspace }}/mhg
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v6
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: ssciwr/parzivAI
