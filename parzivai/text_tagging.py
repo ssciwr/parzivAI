@@ -3,7 +3,6 @@ from pathlib import Path
 import spacy
 from importlib import resources
 
-
 POS_DESCRIPTIONS = {
     "SYM": "Symbol",
     "PUNCT": "Punctuation",
