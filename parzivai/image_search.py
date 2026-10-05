@@ -46,8 +46,7 @@ async def fetch_images(topic: str):
         await page.goto(search_url)
         await asyncio.sleep(5)  # Wait for the page to fully load
 
-        image_data = await page.evaluate(
-            """() => {
+        image_data = await page.evaluate("""() => {
             const images = document.querySelectorAll('img.hit-btn-image-sm');
             const data = Array.from(images).map(img => {
                 const container = img.closest('.hit-cell');
@@ -73,8 +72,7 @@ async def fetch_images(topic: str):
                 };
             }).filter(item => item !== null);
             return data;
-        }"""
-        )
+        }""")
 
         await browser.close()
         return image_data
